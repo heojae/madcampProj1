@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">testapp</string>
+    <string name="action_settings">설정</string>
+    <string name="action_developers">개발자</string>
+</resources>
