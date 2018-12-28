@@ -254,7 +254,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                 alert.setNegativeButton("취소",new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
-
+                        mViewPager.setCurrentItem(0);
                     }
                 });
 
