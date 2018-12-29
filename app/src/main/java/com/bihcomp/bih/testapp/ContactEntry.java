@@ -1,11 +1,11 @@
 package com.bihcomp.bih.testapp;
 
-public class contactEntry {
+public class ContactEntry {
     private String name;
     private String phoneNo;
     private int photo;
 
-    public contactEntry(String _name, String _pn, int _photo) {
+    public ContactEntry(String _name, String _pn, int _photo) {
         this.name = _name;
         this.phoneNo = _pn;
         this.photo = _photo;
