@@ -59,62 +59,6 @@ public class Fragment1 extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Json 파일 테스트용 저장
-        String str =
-                "[{'name':'Pak Jeong-Hun','phonenumber':'010-3659-1044'}," +
-                        "{'name':'Won Jung-Eun','phonenumber':'033-8015-2264'}," +
-                        "{'name':'Hong Byung-Hoon','phonenumber':'052-1624-1104'}," +
-                        "{'name':'Sop Kyong-Su','phonenumber':'010-4728-5356'}," +
-                        "{'name':'Chom Kang-Dae','phonenumber':'062-4032-6077'}," +
-                        "{'name':'Chong Minjun','phonenumber':'051-7086-4133'}," +
-                        "{'name':'Chu Song-Ho','phonenumber':'1588-7473'}," +
-                        "{'name':'Chu Chi-Won','phonenumber':'02-2585-1613'}," +
-                        "{'name':'Eoh Ji-Hoon','phonenumber':'02-1265-5822'}," +
-                        "{'name':'An Ji-Won','phonenumber':'040-9425-5912'}," +
-                        "{'name':'Tan Hyun-Ju','phonenumber':'1588-3958'}," +
-                        "{'name':'Hung Min-Yung','phonenumber':'047-3833-5090'}," +
-                        "{'name':'Ri Mi-Sook','phonenumber':'068-5790-5717'}," +
-                        "{'name':'Chegal Suk-Ja','phonenumber':'1588-9206'}," +
-                        "{'name':'Pong Yi','phonenumber':'1588-9545'}," +
-                        "{'name':'Chung Yu-Ni','phonenumber':'1588-7875'}," +
-                        "{'name':'Hwan Kyong-Ja','phonenumber':'02-4179-7747'}," +
-                        "{'name':'Ogum Un-Ju','phonenumber':'010-4485-3333'}," +
-                        "{'name':'Mangjol Hyon-Ju','phonenumber':'053-8542-5040'}," +
-                        "{'name':'Mae Tae-Young','phonenumber':'010-9034-0169'}," +
-                        "{'name':'Pom Ji-Hun','phonenumber':'1588-1277'}," +
-                        "{'name':'Ki Chuwon','phonenumber':'02-8037-5149'}," +
-                        "{'name':'Kun Min-Jun','phonenumber':'031-9784-3958'}," +
-                        "{'name':'Chang Kang-Dae','phonenumber':'068-8434-2971'}," +
-                        "{'name':'Kim Min-Su','phonenumber':'059-8651-7823'}," +
-                        "{'name':'Pang Min-Kyu','phonenumber':'054-8456-3648'}," +
-                        "{'name':'Chu Kyong-Su','phonenumber':'064-3639-9267'}," +
-                        "{'name':'Nang Suk-Chul','phonenumber':'067-0436-4190'}," +
-                        "{'name':'Ru Dong-Jun','phonenumber':'010-9296-0249'}," +
-                        "{'name':'Sung Sang-Min','phonenumber':'042-3650-9642'}," +
-                        "{'name':'Yun Myung-Hee','phonenumber':'052-4368-7394'}," +
-                        "{'name':'Min Se-Yeon','phonenumber':'02-4893-7244'}," +
-                        "{'name':'Pom Mi-Suk','phonenumber':'033-7327-2767'}," +
-                        "{'name':'Yang Ja-Hyun','phonenumber':'054-9152-2803'}," +
-                        "{'name':'Pung Da-Hee','phonenumber':'010-3425-5002'}," +
-                        "{'name':'Kye Eun-Ah','phonenumber':'070-5128-4608'}," +
-                        "{'name':'Kun Sujin','phonenumber':'02-4429-7810'}," +
-                        "{'name':'Pae Ae','phonenumber':'070-8311-5537'}," +
-                        "{'name':'Ra Hwi-Hyang','phonenumber':'1588-0132'}," +
-                        "{'name':'Sip Eun-Bi','phonenumber':'1588-9463'}," +
-                        "{'name':'Ogum Yong-Gi','phonenumber':'046-0213-2011'}," +
-                        "{'name':'Chang Seong-Hyeon','phonenumber':'032-9671-4492'}," +
-                        "{'name':'Om Young-Soo','phonenumber':'036-3070-9286'}," +
-                        "{'name':'Hwang Seung-Woo','phonenumber':'036-4224-7732'}," +
-                        "{'name':'Tae Song-Ho','phonenumber':'066-0719-8085'}," +
-                        "{'name':'Pyong Sang-Chul','phonenumber':'02-0421-3789'}," +
-                        "{'name':'Ko Myung-Hee','phonenumber':'053-3212-4003'}," +
-                        "{'name':'Chegal Jung-Nam','phonenumber':'1588-9258'}," +
-                        "{'name':'Nae Kwang-Jo','phonenumber':'061-9388-5237'}," +
-                        "{'name':'Kwok Sunghyon','phonenumber':'031-3499-3751'}]";
-
-
-        //JSON 파일 리셋
-        //writeToContactFile(str);
 
         // 어뎁터 설정
         contactAdapter = new contactArrayAdapter(getContext(), R.layout.listview_contact, R.id.eName, contactList);
@@ -141,10 +85,28 @@ public class Fragment1 extends Fragment {
                 JSONObject jObject = jarray.getJSONObject(i);  // JSONObject 추출
                 String phonenumber = jObject.getString("phonenumber");
                 String name = jObject.getString("name");
+                String photo = jObject.getString("photo");
+                int value = jObject.getInt("value");
                 //int age = jObject.getInt("photo");
 
-                contactEntry ne = new contactEntry(name, phonenumber, R.drawable.photo);
-                contactList.add(ne);
+                if(value == 0)
+                {
+                    contactEntry ne = new contactEntry(name, phonenumber, R.drawable.photo);
+                    contactList.add(ne);
+                }
+                else if(value > 0)
+                {
+
+                }
+                else if (value < 0)
+                {
+
+                }
+                else
+                {
+
+                }
+
             }
         } catch (JSONException e) {
             e.printStackTrace();
@@ -191,7 +153,7 @@ public class Fragment1 extends Fragment {
 
                         String tempstr = readFromContactFile();
                         tempstr = tempstr.replace("]"," ");
-                        String addstr =  ",{'name':'" + username[0] + "','phonenumber':'" + userphonenumber[0] + "'}]";
+                        String addstr =  ",{'name':'" + username[0] + "','phonenumber':'" + userphonenumber[0] + ",'value':0'}]";
                         tempstr = tempstr + addstr;
                         Toast.makeText(getContext(), addstr, Toast.LENGTH_SHORT).show();
                         writeToContactFile(tempstr);

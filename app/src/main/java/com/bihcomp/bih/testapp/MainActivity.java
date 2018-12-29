@@ -245,7 +245,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                         String tempstr = readFromContactFile();
                         tempstr = tempstr.replace("]"," ");
-                        String addstr =  ",{'name':'" + username + "','phonenumber':'" + userphonenumber + "'}]";
+                        String addstr =  ",{'name':'" + username + "','phonenumber':'" + userphonenumber + ",'value':0'}]";
                         tempstr = tempstr + addstr;
                         writeToContactFile(tempstr);
                         mViewPager.setCurrentItem(0);
@@ -331,7 +331,63 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
-            Snackbar.make(this.mViewPager, "설정할 메뉴가 없습니다.", Snackbar.LENGTH_LONG)
+            // Json 파일 테스트용 저장
+            String str =
+                    "[{'name':'Pak Jeong-Hun','phonenumber':'010-3659-1044','photo'='man1','value':0}," +
+                            "{'name':'Won Jung-Eun','phonenumber':'033-8015-2264','photo'='man1','value':0}," +
+                            "{'name':'Hong Byung-Hoon','phonenumber':'052-1624-1104','photo'='man1','value':0}," +
+                            "{'name':'Sop Kyong-Su','phonenumber':'010-4728-5356','photo'='man1','value':0}," +
+                            "{'name':'Chom Kang-Dae','phonenumber':'062-4032-6077','photo'='man1','value':0}," +
+                            "{'name':'Chong Minjun','phonenumber':'051-7086-4133','photo'='man1','value':0}," +
+                            "{'name':'Chu Song-Ho','phonenumber':'1588-7473','photo'='man1','value':0}," +
+                            "{'name':'Chu Chi-Won','phonenumber':'02-2585-1613','photo'='man1','value':0}," +
+                            "{'name':'Eoh Ji-Hoon','phonenumber':'02-1265-5822','photo'='man1','value':0}," +
+                            "{'name':'An Ji-Won','phonenumber':'040-9425-5912','photo'='man1','value':0}," +
+                            "{'name':'Tan Hyun-Ju','phonenumber':'1588-3958','photo'='man1','value':0}," +
+                            "{'name':'Hung Min-Yung','phonenumber':'047-3833-5090','photo'='man1','value':0}," +
+                            "{'name':'Ri Mi-Sook','phonenumber':'068-5790-5717','photo'='man1','value':0}," +
+                            "{'name':'Chegal Suk-Ja','phonenumber':'1588-9206','photo'='man1','value':0}," +
+                            "{'name':'Pong Yi','phonenumber':'1588-9545','photo'='man1','value':0}," +
+                            "{'name':'Chung Yu-Ni','phonenumber':'1588-7875','photo'='man1','value':0}," +
+                            "{'name':'Hwan Kyong-Ja','phonenumber':'02-4179-7747','photo'='man1','value':0}," +
+                            "{'name':'Ogum Un-Ju','phonenumber':'010-4485-3333','photo'='man1','value':0}," +
+                            "{'name':'Mangjol Hyon-Ju','phonenumber':'053-8542-5040','photo'='man1','value':0}," +
+                            "{'name':'Mae Tae-Young','phonenumber':'010-9034-0169','photo'='man1','value':0}," +
+                            "{'name':'Pom Ji-Hun','phonenumber':'1588-1277','photo'='man1','value':0}," +
+                            "{'name':'Ki Chuwon','phonenumber':'02-8037-5149','photo'='man1','value':0}," +
+                            "{'name':'Kun Min-Jun','phonenumber':'031-9784-3958','photo'='man1','value':0}," +
+                            "{'name':'Chang Kang-Dae','phonenumber':'068-8434-2971','photo'='man1','value':0}," +
+                            "{'name':'Kim Min-Su','phonenumber':'059-8651-7823','photo'='man1','value':0}," +
+                            "{'name':'Pang Min-Kyu','phonenumber':'054-8456-3648','photo'='man1','value':0}," +
+                            "{'name':'Chu Kyong-Su','phonenumber':'064-3639-9267','photo'='man1','value':0}," +
+                            "{'name':'Nang Suk-Chul','phonenumber':'067-0436-4190','photo'='man1','value':0}," +
+                            "{'name':'Ru Dong-Jun','phonenumber':'010-9296-0249','photo'='man1','value':0}," +
+                            "{'name':'Sung Sang-Min','phonenumber':'042-3650-9642','photo'='man1','value':0}," +
+                            "{'name':'Yun Myung-Hee','phonenumber':'052-4368-7394','photo'='man1','value':0}," +
+                            "{'name':'Min Se-Yeon','phonenumber':'02-4893-7244','photo'='man1','value':0}," +
+                            "{'name':'Pom Mi-Suk','phonenumber':'033-7327-2767','photo'='man1','value':0}," +
+                            "{'name':'Yang Ja-Hyun','phonenumber':'054-9152-2803','photo'='man1','value':0}," +
+                            "{'name':'Pung Da-Hee','phonenumber':'010-3425-5002','photo'='man1','value':0}," +
+                            "{'name':'Kye Eun-Ah','phonenumber':'070-5128-4608','photo'='man1','value':0}," +
+                            "{'name':'Kun Sujin','phonenumber':'02-4429-7810','photo'='man1','value':0}," +
+                            "{'name':'Pae Ae','phonenumber':'070-8311-5537','photo'='man1','value':0}," +
+                            "{'name':'Ra Hwi-Hyang','phonenumber':'1588-0132','photo'='man1','value':0}," +
+                            "{'name':'Sip Eun-Bi','phonenumber':'1588-9463','photo'='man1','value':0}," +
+                            "{'name':'Ogum Yong-Gi','phonenumber':'046-0213-2011','photo'='man1','value':0}," +
+                            "{'name':'Chang Seong-Hyeon','phonenumber':'032-9671-4492','photo'='man1','value':0}," +
+                            "{'name':'Om Young-Soo','phonenumber':'036-3070-9286','photo'='man1','value':0}," +
+                            "{'name':'Hwang Seung-Woo','phonenumber':'036-4224-7732','photo'='man1','value':0}," +
+                            "{'name':'Tae Song-Ho','phonenumber':'066-0719-8085','photo'='man1','value':0}," +
+                            "{'name':'Pyong Sang-Chul','phonenumber':'02-0421-3789','photo'='man1','value':0}," +
+                            "{'name':'Ko Myung-Hee','phonenumber':'053-3212-4003','photo'='man1','value':0}," +
+                            "{'name':'Chegal Jung-Nam','phonenumber':'1588-9258','photo'='man1','value':0}," +
+                            "{'name':'Nae Kwang-Jo','phonenumber':'061-9388-5237','photo'='man1','value':0}," +
+                            "{'name':'Kwok Sunghyon','phonenumber':'031-3499-3751','photo'='man1','value':0}]";
+
+            //JSON 파일 리셋
+            writeToContactFile(str);
+
+            Snackbar.make(this.mViewPager, "연락처가 초기화되었습니다.", Snackbar.LENGTH_LONG)
                     .setAction("Action", null).show();
             return true;
         }
