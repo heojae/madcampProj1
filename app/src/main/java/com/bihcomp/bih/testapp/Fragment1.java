@@ -40,9 +40,11 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.text.Collator;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 
 import static java.lang.Math.min;
 
@@ -93,6 +95,8 @@ public class Fragment1 extends Fragment {
         //return super.onCreateView(inflater, container, savedInstanceState);
         View view = inflater.inflate(R.layout.fragment_fragment1,container,false);
         tempview[0] = view;
+
+
 
         // 리스트 클릭 가능하게 만들기
         mListView = (ListView) view.findViewById(R.id.listview_tab1);
@@ -254,7 +258,16 @@ public class Fragment1 extends Fragment {
                                                     builder.show();
 
 
-                                                    refreshContactList();
+                                                    EditText editTexttemp = (EditText) tempview[0].findViewById(R.id.editTextContact);
+                                                    LinearLayout searchLinearLayouttemp = tempview[0].findViewById(R.id.searchLinearLayout);
+                                                    if (searchLinearLayouttemp.getVisibility() == View.VISIBLE)
+                                                        refreshContactList(editTexttemp.getText().toString());
+                                                    else
+                                                        refreshContactList();
+
+                                                    contactAdapter.notifyDataSetChanged();
+                                                    mListView.invalidateViews();
+
                                                 }
 
                                             }
@@ -311,6 +324,7 @@ public class Fragment1 extends Fragment {
                                                                 writeToContactFile(tempstr);
                                                                 contactAdapter.remove(ent);
                                                                 contactAdapter.notifyDataSetChanged();
+                                                                mListView.invalidateViews();
                                                                 change = true;
                                                             }
                                                         }
@@ -425,7 +439,47 @@ public class Fragment1 extends Fragment {
                                                 Log.d("fixstrvalue", fixstr);
                                                 writeToContactFile(fixstr);
 
-                                                refreshContactList();
+                                                EditText editTexttemp = (EditText) tempview[0].findViewById(R.id.editTextContact);
+                                                LinearLayout searchLinearLayouttemp = tempview[0].findViewById(R.id.searchLinearLayout);
+                                                if (searchLinearLayouttemp.getVisibility() == View.VISIBLE)
+                                                    refreshContactList(editTexttemp.getText().toString());
+                                                else
+                                                    refreshContactList();
+
+                                                contactAdapter.notifyDataSetChanged();
+                                                mListView.invalidateViews();
+
+                                                // 수정된 금액 리스트 추가
+
+                                                String contentstring = readFromTextFile(name);
+                                                boolean noMoneyNoFile = false;
+                                                if(contentstring.length() == 0 && ent.getPersonValue() == 0)
+                                                    noMoneyNoFile = true;
+                                                if(contentstring.length() == 0 && ent.getPersonValue() != 0)
+                                                    contentstring = "기존 금액    " + ent.getPersonValue();
+
+                                                long now = System.currentTimeMillis();
+                                                Date date = new Date(now);
+                                                SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd hh:mm:ss");
+                                                String getTime = sdf.format(date);
+                                                if (editvalue > 0)
+                                                {
+                                                    if (noMoneyNoFile)
+                                                        contentstring = getTime + "    +" + editvalue;
+                                                    else
+                                                        contentstring = contentstring + "[split]" + getTime + "    +" + editvalue;
+                                                }
+                                                else if (editvalue < 0)
+                                                {
+                                                    if (noMoneyNoFile)
+                                                        contentstring = getTime + "    " + editvalue;
+                                                    else
+                                                        contentstring = contentstring + "[split]" + getTime + "    " + editvalue;
+                                                }
+
+
+
+                                                writeToTextFile(name, contentstring);
 
                                             }
                                         });
@@ -712,8 +766,15 @@ public class Fragment1 extends Fragment {
                     ((ImageView)v.findViewById(R.id.ePhoto)).setImageResource(R.drawable.photo);
                 }
             }
+
+
+
+
+
             return v;
         }
+
+
     }
 
 
@@ -993,38 +1054,66 @@ public class Fragment1 extends Fragment {
             outputStreamWriter.close();
         }
         catch (IOException e) {
-            Toast.makeText(this.getContext(), "Exception: File write failed", Toast.LENGTH_SHORT).show();
+            Log.e("WriteFile", "Exception: File write failed (contact.json)");
         }
     }
 
-
     private String readFromContactFile() {
-
         String ret = "";
-
         try {
             InputStream inputStream = getContext().openFileInput("contact.json");
-
             if ( inputStream != null ) {
                 InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
                 BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
                 String receiveString = "";
                 StringBuilder stringBuilder = new StringBuilder();
-
                 while ( (receiveString = bufferedReader.readLine()) != null ) {
                     stringBuilder.append(receiveString);
                 }
-
                 inputStream.close();
                 ret = stringBuilder.toString();
             }
         }
         catch (FileNotFoundException e) {
-            Toast.makeText(this.getContext(), "Exception: File not found", Toast.LENGTH_SHORT).show();
+            Log.e("ReadFile", "Exception: File not found (contact.json)");
         } catch (IOException e) {
-            Toast.makeText(this.getContext(), "Exception: Can not read file", Toast.LENGTH_SHORT).show();
+            Log.e("ReadFile", "Exception: Can not read file (contact.json)");
         }
+        return ret;
+    }
 
+    private void writeToTextFile(String title, String data) {
+        try {
+            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(getContext().openFileOutput(title + ".txt", Context.MODE_PRIVATE));
+            outputStreamWriter.write(data);
+            outputStreamWriter.close();
+        }
+        catch (IOException e) {
+            Log.e("WriteFile", "Exception: File write failed (" + title + ")");
+        }
+    }
+
+    private String readFromTextFile(String title) {
+        String ret = "";
+        try {
+            InputStream inputStream = getContext().openFileInput(title + ".txt");
+            if ( inputStream != null ) {
+                InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+                String receiveString = "";
+                StringBuilder stringBuilder = new StringBuilder();
+                while ( (receiveString = bufferedReader.readLine()) != null ) {
+                    stringBuilder.append(receiveString);
+                }
+                inputStream.close();
+                ret = stringBuilder.toString();
+            }
+        }
+        catch (FileNotFoundException e) {
+            Log.e("ReadFile", "Exception: File not found (" + title + ")");
+        } catch (IOException e) {
+            Log.e("ReadFile", "Exception: Can not read file (" + title + ")");
+        }
         return ret;
     }
 

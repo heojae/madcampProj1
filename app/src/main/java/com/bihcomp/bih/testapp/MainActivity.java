@@ -432,24 +432,25 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case R.id.fab3:
                 anim();
+                if (mViewPager.getCurrentItem() == 0) {
+                    InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+                    EditText editTextCt = (EditText) findViewById(R.id.editTextContact);
+                    LinearLayout searchLinearLayout = findViewById(R.id.searchLinearLayout);
 
-                InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
-                EditText editTextCt = (EditText) findViewById(R.id.editTextContact);
-                LinearLayout searchLinearLayout = findViewById(R.id.searchLinearLayout);
+                    if (searchLinearLayout.getVisibility() == View.VISIBLE) {
+                        searchLinearLayout.setVisibility(View.GONE);
+                        editTextCt.setText("");
+                        editTextCt.clearFocus();
+                        imm.hideSoftInputFromWindow(editTextCt.getWindowToken(), 0);
+                    } else {
+                        searchLinearLayout.setVisibility(View.VISIBLE);
+                        imm.showSoftInput(editTextCt, 0);
+                    }
+                } else if (mViewPager.getCurrentItem() == 1) {
 
-                if (searchLinearLayout.getVisibility() == View.VISIBLE) {
-                    searchLinearLayout.setVisibility(View.GONE);
-                    editTextCt.setText("");
-                    editTextCt.clearFocus();
-                    imm.hideSoftInputFromWindow(editTextCt.getWindowToken(), 0);
-                } else {
-                    searchLinearLayout.setVisibility(View.VISIBLE);
-                    imm.showSoftInput(editTextCt, 0);
+                } else if (mViewPager.getCurrentItem() == 2) {
+
                 }
-
-
-
-
                 break;
         }
     }
@@ -601,7 +602,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             outputStreamWriter.close();
         }
         catch (IOException e) {
-            Toast.makeText(this, "Exception: File write failed", Toast.LENGTH_SHORT).show();
+            Log.e("WriteFile", "Exception: File write failed (contact.json)");
         }
     }
 
@@ -628,9 +629,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         }
         catch (FileNotFoundException e) {
-            Toast.makeText(this, "Exception: File not found", Toast.LENGTH_SHORT).show();
+            Log.e("ReadFile", "Exception: File not found (contact.json)");
         } catch (IOException e) {
-            Toast.makeText(this, "Exception: Can not read file", Toast.LENGTH_SHORT).show();
+            Log.e("ReadFile", "Exception: Can not read file (contact.json)");
         }
 
         return ret;
