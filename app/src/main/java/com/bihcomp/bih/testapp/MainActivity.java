@@ -19,6 +19,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -46,7 +47,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private Animation fab_open, fab_close;
     private Boolean isFabOpen = false;
-    private FloatingActionButton fab, fab1, fab2;
+    private FloatingActionButton fab, fab1, fab2, fab3;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,10 +72,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         fab = (FloatingActionButton) findViewById(R.id.fab);
         fab1 = (FloatingActionButton) findViewById(R.id.fab1);
         fab2 = (FloatingActionButton) findViewById(R.id.fab2);
+        fab3 = (FloatingActionButton) findViewById(R.id.fab3);
 
         fab.setOnClickListener(this);
         fab1.setOnClickListener(this);
         fab2.setOnClickListener(this);
+        fab3.setOnClickListener(this);
 
         // 스와이프할 뷰페이저를 정의
         mViewPager = (ViewPager) findViewById(R.id.pager);
@@ -221,15 +224,34 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     final LinearLayout alertlayout = new LinearLayout(this);
                     alertlayout.setOrientation(LinearLayout.VERTICAL);
 
+
+                    final TextView textViewName = new TextView(this);
+                    textViewName.setText("이름 : ");
+                    alertlayout.addView(textViewName);
+
                     final EditText editTextName = new EditText(this);
-                    editTextName.setHint("이름");
+                    editTextName.setHint("이름을 입력하세요.                    ");
                     alertlayout.addView(editTextName);
 
+                    final TextView textViewPhonenumber = new TextView(this);
+                    textViewPhonenumber.setText("전화번호 : ");
+                    alertlayout.addView(textViewPhonenumber);
+
                     final EditText editTextPhonenumber = new EditText(this);
-                    editTextPhonenumber.setHint("전화번호");
+                    editTextPhonenumber.setHint("전화번호를 입력하세요.                    ");
                     alertlayout.addView(editTextPhonenumber);
 
-                    alert.setView(alertlayout);
+
+                    final TextView textViewtemp = new TextView(this);
+                    textViewtemp.setText("        ");
+
+
+                    final LinearLayout wraplayout = new LinearLayout(this);
+                    wraplayout.setOrientation(LinearLayout.HORIZONTAL);
+                    wraplayout.addView(textViewtemp);
+                    wraplayout.addView(alertlayout);
+
+                    alert.setView(wraplayout);
 
                     alert.setPositiveButton("제거", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int whichButton) {
@@ -408,6 +430,27 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                 }
                 break;
+            case R.id.fab3:
+                anim();
+
+                InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+                EditText editTextCt = (EditText) findViewById(R.id.editTextContact);
+                LinearLayout searchLinearLayout = findViewById(R.id.searchLinearLayout);
+
+                if (searchLinearLayout.getVisibility() == View.VISIBLE) {
+                    searchLinearLayout.setVisibility(View.GONE);
+                    editTextCt.setText("");
+                    editTextCt.clearFocus();
+                    imm.hideSoftInputFromWindow(editTextCt.getWindowToken(), 0);
+                } else {
+                    searchLinearLayout.setVisibility(View.VISIBLE);
+                    imm.showSoftInput(editTextCt, 0);
+                }
+
+
+
+
+                break;
         }
     }
 
@@ -418,14 +461,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (isFabOpen) {
             fab1.startAnimation(fab_close);
             fab2.startAnimation(fab_close);
+            fab3.startAnimation(fab_close);
             fab1.setClickable(false);
             fab2.setClickable(false);
+            fab3.setClickable(false);
             isFabOpen = false;
         } else {
             fab1.startAnimation(fab_open);
             fab2.startAnimation(fab_open);
+            fab3.startAnimation(fab_open);
             fab1.setClickable(true);
             fab2.setClickable(true);
+            fab3.setClickable(true);
             isFabOpen = true;
         }
     }

@@ -12,7 +12,9 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
+import android.text.Editable;
 import android.text.InputType;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -37,7 +39,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.text.Collator;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 import static java.lang.Math.min;
 
@@ -266,46 +271,6 @@ public class Fragment1 extends Fragment {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
                                     }
                                 })
                                 .setPositiveButton("삭제", new DialogInterface.OnClickListener() {
@@ -490,7 +455,7 @@ public class Fragment1 extends Fragment {
 
 
 
-
+        /* 추가 버튼 MainActivity로 이동
         Button addButton = (Button) view.findViewById(R.id.add) ;
         addButton.setOnClickListener(new Button.OnClickListener() {
             public void onClick(View v) {
@@ -552,9 +517,52 @@ public class Fragment1 extends Fragment {
                 contactAdapter.notifyDataSetChanged();
             }
         }) ;
+        */
 
 
+        final EditText editTextCt = (EditText) view.findViewById(R.id.editTextContact);
+        editTextCt.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                //입력하기 전
+            }
 
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                //EditText에 변화가 있을 때
+
+                // 리스트 리프레시
+                //refreshContactList(editTextCt.getText().toString());
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                //입력이 끝났을 때
+
+                // 리스트 리프레시
+                refreshContactList(editTextCt.getText().toString());
+                contactAdapter.notifyDataSetChanged();
+                mListView.invalidateViews();
+            }
+        });
+
+        Button searchContactButton = (Button) view.findViewById(R.id.add) ;
+        searchContactButton.setOnClickListener(new Button.OnClickListener() {
+            public void onClick(View v) {
+                // 값 입력 창 제작
+
+
+                // 리스트 리프레시
+                refreshContactList(editTextCt.getText().toString());
+                contactAdapter.notifyDataSetChanged();
+                mListView.invalidateViews();
+                editTextCt.clearFocus();
+                editTextCt.setSelected(false);
+
+                mListView.requestFocus();
+
+            }
+        }) ;
 
 
 
@@ -664,9 +672,22 @@ public class Fragment1 extends Fragment {
         return view;
     }
 
+
+
+    private final static Comparator<ContactEntry> myComparatorName= new Comparator<ContactEntry>() {
+        private final Collator collator = Collator.getInstance();
+        @Override
+        public int compare(ContactEntry object1, ContactEntry object2) {
+            return collator.compare(object1.getName(), object2.getName());
+        }
+    };
+
+
     private class contactArrayAdapter extends ArrayAdapter<ContactEntry> {
         private ArrayList<ContactEntry> items;
         private int rsrc;
+
+
 
         public contactArrayAdapter(Context ctx, int rsrcId, int txtId, ArrayList<ContactEntry> data) {
             super(ctx, rsrcId, txtId, data);
@@ -696,18 +717,6 @@ public class Fragment1 extends Fragment {
     }
 
 
-    private void writeToContactFile(String data) {
-        try {
-            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(getContext().openFileOutput("contact.json", Context.MODE_PRIVATE));
-            outputStreamWriter.write(data);
-            outputStreamWriter.close();
-        }
-        catch (IOException e) {
-            Toast.makeText(this.getContext(), "Exception: File write failed", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-
     private void refreshContactList() {
         contactAdapter.clear();
 
@@ -728,81 +737,81 @@ public class Fragment1 extends Fragment {
                 if(value == 0)
                 {
                     if(photo.equals("man1")) {
-                        ContactEntry ne = new ContactEntry(name, phonenumber, R.drawable.man1);
+                        ContactEntry ne = new ContactEntry(name, phonenumber, photo, value, R.drawable.man1);
                         contactList.add(ne);
                     } else if (photo.equals("man2")) {
-                        ContactEntry ne = new ContactEntry(name, phonenumber, R.drawable.man2);
+                        ContactEntry ne = new ContactEntry(name, phonenumber, photo, value, R.drawable.man2);
                         contactList.add(ne);
                     } else if (photo.equals("man3")) {
-                        ContactEntry ne = new ContactEntry(name, phonenumber, R.drawable.man3);
+                        ContactEntry ne = new ContactEntry(name, phonenumber, photo, value, R.drawable.man3);
                         contactList.add(ne);
                     } else if (photo.equals("woman1")) {
-                        ContactEntry ne = new ContactEntry(name, phonenumber, R.drawable.woman1);
+                        ContactEntry ne = new ContactEntry(name, phonenumber, photo, value, R.drawable.woman1);
                         contactList.add(ne);
                     } else if (photo.equals("woman2")) {
-                        ContactEntry ne = new ContactEntry(name, phonenumber, R.drawable.woman2);
+                        ContactEntry ne = new ContactEntry(name, phonenumber, photo, value, R.drawable.woman2);
                         contactList.add(ne);
                     } else if (photo.equals("woman3")) {
-                        ContactEntry ne = new ContactEntry(name, phonenumber, R.drawable.woman3);
+                        ContactEntry ne = new ContactEntry(name, phonenumber, photo, value, R.drawable.woman3);
                         contactList.add(ne);
                     } else {
-                        ContactEntry ne = new ContactEntry(name, phonenumber, R.drawable.man1);
+                        ContactEntry ne = new ContactEntry(name, phonenumber, photo, value, R.drawable.man1);
                         contactList.add(ne);
                     }
                 }
                 else if(value > 0)
                 {
                     if(photo.equals("man1")) {
-                        ContactEntry ne = new ContactEntry(name, phonenumber, R.drawable.man1_plus);
+                        ContactEntry ne = new ContactEntry(name, phonenumber, photo, value, R.drawable.man1_plus);
                         contactList.add(ne);
                     } else if (photo.equals("man2")) {
-                        ContactEntry ne = new ContactEntry(name, phonenumber, R.drawable.man2_plus);
+                        ContactEntry ne = new ContactEntry(name, phonenumber, photo, value, R.drawable.man2_plus);
                         contactList.add(ne);
                     } else if (photo.equals("man3")) {
-                        ContactEntry ne = new ContactEntry(name, phonenumber, R.drawable.man3_plus);
+                        ContactEntry ne = new ContactEntry(name, phonenumber, photo, value, R.drawable.man3_plus);
                         contactList.add(ne);
                     } else if (photo.equals("woman1")) {
-                        ContactEntry ne = new ContactEntry(name, phonenumber, R.drawable.woman1_plus);
+                        ContactEntry ne = new ContactEntry(name, phonenumber, photo, value, R.drawable.woman1_plus);
                         contactList.add(ne);
                     } else if (photo.equals("woman2")) {
-                        ContactEntry ne = new ContactEntry(name, phonenumber, R.drawable.woman2_plus);
+                        ContactEntry ne = new ContactEntry(name, phonenumber, photo, value, R.drawable.woman2_plus);
                         contactList.add(ne);
                     } else if (photo.equals("woman3")) {
-                        ContactEntry ne = new ContactEntry(name, phonenumber, R.drawable.woman3_plus);
+                        ContactEntry ne = new ContactEntry(name, phonenumber, photo, value, R.drawable.woman3_plus);
                         contactList.add(ne);
                     } else {
-                        ContactEntry ne = new ContactEntry(name, phonenumber, R.drawable.man1_plus);
+                        ContactEntry ne = new ContactEntry(name, phonenumber, photo, value, R.drawable.man1_plus);
                         contactList.add(ne);
                     }
                 }
                 else if(value < 0)
                 {
                     if(photo.equals("man1")) {
-                        ContactEntry ne = new ContactEntry(name, phonenumber, R.drawable.man1_minus);
+                        ContactEntry ne = new ContactEntry(name, phonenumber, photo, value, R.drawable.man1_minus);
                         contactList.add(ne);
                     } else if (photo.equals("man2")) {
-                        ContactEntry ne = new ContactEntry(name, phonenumber, R.drawable.man2_minus);
+                        ContactEntry ne = new ContactEntry(name, phonenumber, photo, value, R.drawable.man2_minus);
                         contactList.add(ne);
                     } else if (photo.equals("man3")) {
-                        ContactEntry ne = new ContactEntry(name, phonenumber, R.drawable.man3_minus);
+                        ContactEntry ne = new ContactEntry(name, phonenumber, photo, value, R.drawable.man3_minus);
                         contactList.add(ne);
                     } else if (photo.equals("woman1")) {
-                        ContactEntry ne = new ContactEntry(name, phonenumber, R.drawable.woman1_minus);
+                        ContactEntry ne = new ContactEntry(name, phonenumber, photo, value, R.drawable.woman1_minus);
                         contactList.add(ne);
                     } else if (photo.equals("woman2")) {
-                        ContactEntry ne = new ContactEntry(name, phonenumber, R.drawable.woman2_minus);
+                        ContactEntry ne = new ContactEntry(name, phonenumber, photo, value, R.drawable.woman2_minus);
                         contactList.add(ne);
                     } else if (photo.equals("woman3")) {
-                        ContactEntry ne = new ContactEntry(name, phonenumber, R.drawable.woman3_minus);
+                        ContactEntry ne = new ContactEntry(name, phonenumber, photo, value, R.drawable.woman3_minus);
                         contactList.add(ne);
                     } else {
-                        ContactEntry ne = new ContactEntry(name, phonenumber, R.drawable.man1_minus);
+                        ContactEntry ne = new ContactEntry(name, phonenumber, photo, value, R.drawable.man1_minus);
                         contactList.add(ne);
                     }
                 }
                 else
                 {
-                    ContactEntry ne = new ContactEntry(name, phonenumber, R.drawable.man1);
+                    ContactEntry ne = new ContactEntry(name, phonenumber, photo, value, R.drawable.man1);
                     contactList.add(ne);
                 }
 
@@ -814,7 +823,178 @@ public class Fragment1 extends Fragment {
 
         // 어뎁터 설정
 
+        Collections.sort(contactList, myComparatorName);
         contactAdapter = new contactArrayAdapter(getContext(), R.layout.listview_contact, R.id.eName, contactList);
+    }
+
+
+    private void refreshContactList(String filterText) {
+        contactAdapter.clear();
+
+        // Json 파일 읽어오기
+        contactStr = readFromContactFile();
+
+        try {
+            JSONArray jarray = new JSONArray(contactStr);   // JSONArray 생성
+            for(int i=0; i < jarray.length(); i++){
+                JSONObject jObject = jarray.getJSONObject(i);  // JSONObject 추출
+                String phonenumber = jObject.getString("phonenumber");
+                String name = jObject.getString("name");
+                String photo = jObject.getString("photo");
+                int value = jObject.getInt("value");
+
+                Log.d("JSONArray", "phonenumber " + phonenumber + " name " + name + " photo " + photo + " value " + value);
+
+                if(value == 0 && (name.toLowerCase().contains(filterText.toLowerCase()) || phonenumber.toLowerCase().contains(filterText.toLowerCase())))
+                {
+                    if(photo.equals("man1")) {
+                        ContactEntry ne = new ContactEntry(name, phonenumber, photo, value, R.drawable.man1);
+                        contactList.add(ne);
+                    } else if (photo.equals("man2")) {
+                        ContactEntry ne = new ContactEntry(name, phonenumber, photo, value, R.drawable.man2);
+                        contactList.add(ne);
+                    } else if (photo.equals("man3")) {
+                        ContactEntry ne = new ContactEntry(name, phonenumber, photo, value, R.drawable.man3);
+                        contactList.add(ne);
+                    } else if (photo.equals("woman1")) {
+                        ContactEntry ne = new ContactEntry(name, phonenumber, photo, value, R.drawable.woman1);
+                        contactList.add(ne);
+                    } else if (photo.equals("woman2")) {
+                        ContactEntry ne = new ContactEntry(name, phonenumber, photo, value, R.drawable.woman2);
+                        contactList.add(ne);
+                    } else if (photo.equals("woman3")) {
+                        ContactEntry ne = new ContactEntry(name, phonenumber, photo, value, R.drawable.woman3);
+                        contactList.add(ne);
+                    } else {
+                        ContactEntry ne = new ContactEntry(name, phonenumber, photo, value, R.drawable.man1);
+                        contactList.add(ne);
+                    }
+                }
+                else if(value > 0 && (name.toLowerCase().contains(filterText.toLowerCase()) || phonenumber.toLowerCase().contains(filterText.toLowerCase())))
+                {
+                    if(photo.equals("man1")) {
+                        ContactEntry ne = new ContactEntry(name, phonenumber, photo, value, R.drawable.man1_plus);
+                        contactList.add(ne);
+                    } else if (photo.equals("man2")) {
+                        ContactEntry ne = new ContactEntry(name, phonenumber, photo, value, R.drawable.man2_plus);
+                        contactList.add(ne);
+                    } else if (photo.equals("man3")) {
+                        ContactEntry ne = new ContactEntry(name, phonenumber, photo, value, R.drawable.man3_plus);
+                        contactList.add(ne);
+                    } else if (photo.equals("woman1")) {
+                        ContactEntry ne = new ContactEntry(name, phonenumber, photo, value, R.drawable.woman1_plus);
+                        contactList.add(ne);
+                    } else if (photo.equals("woman2")) {
+                        ContactEntry ne = new ContactEntry(name, phonenumber, photo, value, R.drawable.woman2_plus);
+                        contactList.add(ne);
+                    } else if (photo.equals("woman3")) {
+                        ContactEntry ne = new ContactEntry(name, phonenumber, photo, value, R.drawable.woman3_plus);
+                        contactList.add(ne);
+                    } else {
+                        ContactEntry ne = new ContactEntry(name, phonenumber, photo, value, R.drawable.man1_plus);
+                        contactList.add(ne);
+                    }
+                }
+                else if(value < 0 && (name.toLowerCase().contains(filterText.toLowerCase()) || phonenumber.toLowerCase().contains(filterText.toLowerCase())))
+                {
+                    if(photo.equals("man1")) {
+                        ContactEntry ne = new ContactEntry(name, phonenumber, photo, value, R.drawable.man1_minus);
+                        contactList.add(ne);
+                    } else if (photo.equals("man2")) {
+                        ContactEntry ne = new ContactEntry(name, phonenumber, photo, value, R.drawable.man2_minus);
+                        contactList.add(ne);
+                    } else if (photo.equals("man3")) {
+                        ContactEntry ne = new ContactEntry(name, phonenumber, photo, value, R.drawable.man3_minus);
+                        contactList.add(ne);
+                    } else if (photo.equals("woman1")) {
+                        ContactEntry ne = new ContactEntry(name, phonenumber, photo, value, R.drawable.woman1_minus);
+                        contactList.add(ne);
+                    } else if (photo.equals("woman2")) {
+                        ContactEntry ne = new ContactEntry(name, phonenumber, photo, value, R.drawable.woman2_minus);
+                        contactList.add(ne);
+                    } else if (photo.equals("woman3")) {
+                        ContactEntry ne = new ContactEntry(name, phonenumber, photo, value, R.drawable.woman3_minus);
+                        contactList.add(ne);
+                    } else {
+                        ContactEntry ne = new ContactEntry(name, phonenumber, photo, value, R.drawable.man1_minus);
+                        contactList.add(ne);
+                    }
+                }
+                else
+                {
+                    /*
+                    ContactEntry ne = new ContactEntry(name, phonenumber, photo, value, R.drawable.man1);
+                    contactList.add(ne);
+                    */
+                }
+
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+            Log.d("JSONArray", "Parsing Error Currupt");
+        }
+
+        // 어뎁터 설정
+
+        // 정렬
+        Collections.sort(contactList, myComparatorName);
+
+
+        // 입력 string과 비슷한 위치가 가장 앞쪽에 있도록 변경
+        ArrayList<ContactEntry> tempContactList = new ArrayList<ContactEntry>();
+
+        for (int i = 0; contactList.size() != 0 && i < 100; i++)
+        {
+            Log.d("contactList", "value: " + i);
+            Log.d("contactList", "size: " + contactList.size());
+
+            for (int j = 0; j < contactList.size(); j++)
+            {
+                if (contactList.get(j).getName().toLowerCase().indexOf(filterText.toLowerCase()) == i)
+                {
+                    tempContactList.add(contactList.get(j));
+                    contactList.remove(j);
+                    j--;
+                }
+            }
+        }
+
+        for (int i = 0; contactList.size() != 0 && i < 100; i++)
+        {
+            Log.d("contactList", "value: " + i);
+            Log.d("contactList", "size: " + contactList.size());
+
+            for (int j = 0; j < contactList.size(); j++)
+            {
+                if (contactList.get(j).getPhoneNo().toLowerCase().indexOf(filterText.toLowerCase()) == i)
+                {
+                    tempContactList.add(contactList.get(j));
+                    contactList.remove(j);
+                    j--;
+                }
+            }
+        }
+
+        contactList.clear();
+        for (int i = 0; i < tempContactList.size(); i++)
+            contactList.add(tempContactList.get(i));
+
+
+        contactAdapter = new contactArrayAdapter(getContext(), R.layout.listview_contact, R.id.eName, contactList);
+    }
+
+
+
+
+    private void writeToContactFile(String data) {
+        try {
+            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(getContext().openFileOutput("contact.json", Context.MODE_PRIVATE));
+            outputStreamWriter.write(data);
+            outputStreamWriter.close();
+        }
+        catch (IOException e) {
+            Toast.makeText(this.getContext(), "Exception: File write failed", Toast.LENGTH_SHORT).show();
+        }
     }
 
 

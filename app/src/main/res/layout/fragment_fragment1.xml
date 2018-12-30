@@ -28,9 +28,13 @@
         android:orientation="vertical">
 
         <LinearLayout
+            android:id="@+id/searchLinearLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:orientation="horizontal"
+            android:visibility="gone">
 
             <TextView
                 android:id="@+id/textView"
@@ -42,20 +46,20 @@
                 android:textAlignment="center" />
 
             <EditText
-                android:id="@+id/editText"
+                android:id="@+id/editTextContact"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="5"
                 android:ems="10"
                 android:inputType="textPersonName"
-                android:text="Name" />
+                android:hint="이름, 전화번호 입력" />
 
             <ImageButton
                 android:id="@+id/imageButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:backgroundTint="?attr/colorBackgroundFloating"
+                android:backgroundTint="#00FFFFFF"
                 android:src="?android:attr/actionModeWebSearchDrawable" />
 
         </LinearLayout>

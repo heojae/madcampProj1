@@ -11,4 +11,9 @@
         android:text="fragment3"
         android:textAlignment="textEnd" />
 
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/myRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
 </FrameLayout>
