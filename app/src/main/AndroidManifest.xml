@@ -17,11 +17,19 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".Fragment1" />
-        <activity android:name=".Fragment2" />
-        <activity android:name=".Fragment3"></activity>
+        <activity
+            android:name=".Fragment2">
+        </activity>
+        <activity
+            android:name=".ImagePopup">
+        </activity>
+        <activity
+            android:name="android.widget.PopupWindow">
+        </activity>
     </application>
 
+
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.CALL_PHONE"></uses-permission>
 </manifest>
