@@ -22,6 +22,7 @@
         <activity android:name=".Fragment3"></activity>
     </application>
 
-    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE"></uses-permission>
     <uses-permission android:name="android.permission.CALL_PHONE"></uses-permission>
+    <uses-permission android:name="android.permission.DIAL_PHONE"></uses-permission>
 </manifest>
