@@ -18,18 +18,12 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".Fragment2">
-        </activity>
-        <activity
             android:name=".ImagePopup">
         </activity>
-        <activity
-            android:name="android.widget.PopupWindow">
-        </activity>
     </application>
-
-
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE"></uses-permission>
     <uses-permission android:name="android.permission.CALL_PHONE"></uses-permission>
+    <uses-permission android:name="android.permission.DIAL_PHONE"></uses-permission>
+    <uses-permission android:name="android.permission.READ_CONTACTS"></uses-permission>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 </manifest>

@@ -4,8 +4,11 @@ import android.Manifest;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.database.Cursor;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
@@ -17,11 +20,13 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -56,7 +61,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private Animation fab_open, fab_close;
     private Boolean isFabOpen = false;
-    private FloatingActionButton fab, fab1, fab2;
+    private FloatingActionButton fab, fab1, fab2, fab3;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,10 +104,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         fab = (FloatingActionButton) findViewById(R.id.fab);
         fab1 = (FloatingActionButton) findViewById(R.id.fab1);
         fab2 = (FloatingActionButton) findViewById(R.id.fab2);
+        fab3 = (FloatingActionButton) findViewById(R.id.fab3);
 
         fab.setOnClickListener(this);
         fab1.setOnClickListener(this);
         fab2.setOnClickListener(this);
+        fab3.setOnClickListener(this);
 
         // 스와이프할 뷰페이저를 정의
         mViewPager = (ViewPager) findViewById(R.id.pager);
@@ -239,61 +246,291 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case R.id.fab1:
                 anim();
+                if (mViewPager.getCurrentItem() == 0) {
+                    // 값 입력 창 제작
+                    AlertDialog.Builder alert = new AlertDialog.Builder(this);
+
+                    alert.setTitle("기존 연락처 제거");
+                    alert.setMessage("이름과 전화번호를 입력해주세요.");
+
+                    final LinearLayout alertlayout = new LinearLayout(this);
+                    alertlayout.setOrientation(LinearLayout.VERTICAL);
 
 
+                    final TextView textViewName = new TextView(this);
+                    textViewName.setText("이름 : ");
+                    alertlayout.addView(textViewName);
 
+                    final EditText editTextName = new EditText(this);
+                    editTextName.setHint("이름을 입력하세요.                    ");
+                    alertlayout.addView(editTextName);
+
+                    final TextView textViewPhonenumber = new TextView(this);
+                    textViewPhonenumber.setText("전화번호 : ");
+                    alertlayout.addView(textViewPhonenumber);
+
+                    final EditText editTextPhonenumber = new EditText(this);
+                    editTextPhonenumber.setHint("전화번호를 입력하세요.                    ");
+                    alertlayout.addView(editTextPhonenumber);
+
+
+                    final TextView textViewtemp = new TextView(this);
+                    textViewtemp.setText("        ");
+
+
+                    final LinearLayout wraplayout = new LinearLayout(this);
+                    wraplayout.setOrientation(LinearLayout.HORIZONTAL);
+                    wraplayout.addView(textViewtemp);
+                    wraplayout.addView(alertlayout);
+
+                    alert.setView(wraplayout);
+
+                    alert.setPositiveButton("제거", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int whichButton) {
+
+                            String username = editTextName.getText().toString();
+                            String userphonenumber = editTextPhonenumber.getText().toString();
+
+                            String tempstr = readFromContactFile();
+
+                            if (username.length() == 0 || userphonenumber.length() == 0){
+                                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                                builder.setTitle("알림");
+                                builder.setMessage("이름과 전화번호를 모두 입력하세요.");
+                                builder.setNegativeButton("확인",
+                                        new DialogInterface.OnClickListener() {
+                                            public void onClick(DialogInterface dialog, int which) {
+
+                                            }
+                                        });
+                                builder.show();
+                            } else if (tempstr.contains(username) && tempstr.contains(userphonenumber)) {
+                                String expectedstr1 = "{'name':'" + username + "','phonenumber':'" + userphonenumber + "','photo':'man1','value':0}";
+                                String expectedstr2 = "{'name':'" + username + "','phonenumber':'" + userphonenumber + "','photo':'man2','value':0}";
+                                String expectedstr3 = "{'name':'" + username + "','phonenumber':'" + userphonenumber + "','photo':'man3','value':0}";
+                                String expectedstr4 = "{'name':'" + username + "','phonenumber':'" + userphonenumber + "','photo':'woman1','value':0}";
+                                String expectedstr5 = "{'name':'" + username + "','phonenumber':'" + userphonenumber + "','photo':'woman2','value':0}";
+                                String expectedstr6 = "{'name':'" + username + "','phonenumber':'" + userphonenumber + "','photo':'woman3','value':0}";
+                                String expectedstrs[] = {expectedstr1, expectedstr2, expectedstr3, expectedstr4, expectedstr5, expectedstr6};
+
+                                boolean change = false;
+
+                                for (int i = 0; i < expectedstrs.length; i++) {
+                                    if (tempstr.indexOf(expectedstrs[i]) > -1) {
+                                        if (tempstr.indexOf(expectedstrs[i]) == 1){
+                                            tempstr = tempstr.replace(expectedstrs[i], "");
+                                            tempstr = tempstr.replaceFirst(",", "");
+                                        } else {
+                                            tempstr = tempstr.replace(expectedstrs[i], "");
+                                            tempstr = tempstr.replace(",,", ",");
+                                        }
+                                        writeToContactFile(tempstr);
+                                        change = true;
+                                    }
+                                }
+
+                                if (!change) {
+                                    AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                                    builder.setTitle("알림");
+                                    builder.setMessage("금액이 남은 경우 삭제하실 수 없습니다.");
+                                    builder.setNegativeButton("확인",
+                                            new DialogInterface.OnClickListener() {
+                                                public void onClick(DialogInterface dialog, int which) {
+
+                                                }
+                                            });
+                                    builder.show();
+                                }
+                            } else {
+                                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                                builder.setTitle("알림");
+                                builder.setMessage("이름과 전화번호가 존재하지 않습니다.");
+                                builder.setNegativeButton("확인",
+                                        new DialogInterface.OnClickListener() {
+                                            public void onClick(DialogInterface dialog, int which) {
+
+                                            }
+                                        });
+                                builder.show();
+                            }
+
+                            mViewPager.setCurrentItem(0);
+                        }
+                    });
+
+                    alert.setNegativeButton("취소",new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int whichButton) {
+                            mViewPager.setCurrentItem(0);
+                        }
+                    });
+
+                    alert.show();
+
+                    mViewPager.refreshDrawableState();
+                    mViewPager.setCurrentItem(2);
+                } else if (mViewPager.getCurrentItem() == 1) {
+
+                } else if (mViewPager.getCurrentItem() == 2) {
+                    mViewPager.setCurrentItem(0);
+                    Snackbar.make(this.mViewPager, "값을 추가할 연락처를 선택하세요.", Snackbar.LENGTH_LONG)
+                            .setAction("Action", null).show();
+                }
                 break;
             case R.id.fab2:
                 anim();
+                if (mViewPager.getCurrentItem() == 0) {
+                    // 값 입력 창 제작
+                    AlertDialog.Builder alert = new AlertDialog.Builder(this);
 
-                // 값 입력 창 제작
-                AlertDialog.Builder alert = new AlertDialog.Builder(this);
+                    alert.setTitle("새 연락처 추가");
+                    alert.setMessage("이름과 전화번호를 입력해주세요.");
 
-                alert.setTitle("새 연락처 추가");
-                alert.setMessage("이름과 전화번호를 입력해주세요.");
+                    final LinearLayout alertlayout = new LinearLayout(this);
+                    alertlayout.setOrientation(LinearLayout.VERTICAL);
 
 
-                final LinearLayout alertlayout = new LinearLayout(this);
-                alertlayout.setOrientation(LinearLayout.VERTICAL);
+                    final TextView textViewName = new TextView(this);
+                    textViewName.setText("이름 : ");
+                    alertlayout.addView(textViewName);
 
-                final EditText editTextName = new EditText(this);
-                editTextName.setHint("이름");
-                alertlayout.addView(editTextName);
+                    final EditText editTextName = new EditText(this);
+                    editTextName.setHint("이름을 입력하세요.                    ");
+                    alertlayout.addView(editTextName);
 
-                final EditText editTextPhonenumber = new EditText(this);
-                editTextPhonenumber.setHint("전화번호");
-                alertlayout.addView(editTextPhonenumber);
+                    final TextView textViewPhonenumber = new TextView(this);
+                    textViewPhonenumber.setText("전화번호 : ");
+                    alertlayout.addView(textViewPhonenumber);
 
-                alert.setView(alertlayout);
+                    final EditText editTextPhonenumber = new EditText(this);
+                    editTextPhonenumber.setHint("전화번호를 입력하세요.                    ");
+                    alertlayout.addView(editTextPhonenumber);
 
-                alert.setPositiveButton("추가", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int whichButton) {
 
-                        String username = editTextName.getText().toString();
-                        String userphonenumber = editTextPhonenumber.getText().toString();
+                    final TextView textViewtemp = new TextView(this);
+                    textViewtemp.setText("        ");
 
-                        String tempstr = readFromContactFile();
-                        tempstr = tempstr.replace("]"," ");
-                        String addstr =  ",{'name':'" + username + "','phonenumber':'" + userphonenumber + "'}]";
-                        tempstr = tempstr + addstr;
-                        writeToContactFile(tempstr);
-                        mViewPager.setCurrentItem(0);
+
+                    final LinearLayout wraplayout = new LinearLayout(this);
+                    wraplayout.setOrientation(LinearLayout.HORIZONTAL);
+                    wraplayout.addView(textViewtemp);
+                    wraplayout.addView(alertlayout);
+
+                    alert.setView(wraplayout);
+
+                    alert.setPositiveButton("추가", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int whichButton) {
+                            String username = editTextName.getText().toString();
+                            String userphonenumber = editTextPhonenumber.getText().toString();
+
+                            if (username.length() == 0 || userphonenumber.length() == 0){
+                                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                                builder.setTitle("알림");
+                                builder.setMessage("이름과 전화번호를 모두 입력하세요.");
+                                builder.setNegativeButton("확인",
+                                        new DialogInterface.OnClickListener() {
+                                            public void onClick(DialogInterface dialog, int which) {
+
+                                            }
+                                        });
+                                builder.show();
+                                mViewPager.setCurrentItem(0);
+                            } else {
+                                String tempstr = readFromContactFile();
+                                tempstr = tempstr.replace("]","");
+                                String addstr =  ",{'name':'" + username + "','phonenumber':'" + userphonenumber + "','photo':'man1','value':0}]";
+                                tempstr = tempstr + addstr;
+                                writeToContactFile(tempstr);
+                                //Toast.makeText(getParent(), addstr, Toast.LENGTH_SHORT).show();
+                                Log.d("addstr", addstr);
+                                mViewPager.setCurrentItem(0);
+                            }
+
+                        }
+                    });
+
+                    alert.setNegativeButton("취소",new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int whichButton) {
+                            mViewPager.setCurrentItem(0);
+                        }
+                    });
+                    alert.setNeutralButton("연락처 선택", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int whichButton) {
+                            Intent mIntent = new Intent(Intent.ACTION_PICK);
+                            mIntent.setData(ContactsContract.CommonDataKinds.Phone.CONTENT_URI);
+                            startActivityForResult(mIntent, 0);
+
+                        }
+                    });
+
+                    alert.show();
+
+                    mViewPager.refreshDrawableState();
+                    mViewPager.setCurrentItem(2);
+                } else if (mViewPager.getCurrentItem() == 1) {
+
+                } else if (mViewPager.getCurrentItem() == 2) {
+                    mViewPager.setCurrentItem(0);
+                    Snackbar.make(this.mViewPager, "값을 제거할 연락처를 선택하세요.", Snackbar.LENGTH_LONG)
+                            .setAction("Action", null).show();
+                }
+                break;
+            case R.id.fab3:
+                anim();
+                if (mViewPager.getCurrentItem() == 0) {
+                    InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+                    EditText editTextCt = (EditText) findViewById(R.id.editTextContact);
+                    LinearLayout searchLinearLayout = findViewById(R.id.searchLinearLayout);
+
+                    if (searchLinearLayout.getVisibility() == View.VISIBLE) {
+                        searchLinearLayout.setVisibility(View.GONE);
+                        editTextCt.setText("");
+                        editTextCt.clearFocus();
+                        imm.hideSoftInputFromWindow(editTextCt.getWindowToken(), 0);
+                    } else {
+                        searchLinearLayout.setVisibility(View.VISIBLE);
+                        imm.showSoftInput(editTextCt, 0);
                     }
-                });
+                } else if (mViewPager.getCurrentItem() == 1) {
 
-                alert.setNegativeButton("취소",new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int whichButton) {
-                        mViewPager.setCurrentItem(0);
-                    }
-                });
+                } else if (mViewPager.getCurrentItem() == 2) {
 
-                alert.show();
-
-                mViewPager.refreshDrawableState();
-                mViewPager.setCurrentItem(2);
+                }
                 break;
         }
     }
+
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(resultCode == RESULT_OK)
+        {
+            Cursor cursor = getContentResolver().query(data.getData(),
+                    new String[]{ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME,
+                            ContactsContract.CommonDataKinds.Phone.NUMBER}, null, null, null);
+            cursor.moveToFirst();
+            String sName   = cursor.getString(0);
+            String sNumber = cursor.getString(1);
+            cursor.close();
+
+            String tempstr = readFromContactFile();
+            tempstr = tempstr.replace("]","");
+            String addstr =  ",{'name':'" + sName + "','phonenumber':'" + sNumber + "','photo':'man1','value':0}]";
+            tempstr = tempstr + addstr;
+            writeToContactFile(tempstr);
+            //Toast.makeText(getParent(), addstr, Toast.LENGTH_SHORT).show();
+            Log.d("addstr", addstr);
+
+            Snackbar.make(this.mViewPager, sName + " 님의 연락처가 추가되었습니다.", Snackbar.LENGTH_LONG)
+                    .setAction("Action", null).show();
+
+
+
+        }
+        mViewPager.setCurrentItem(0);
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
 
 
 
@@ -302,14 +539,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (isFabOpen) {
             fab1.startAnimation(fab_close);
             fab2.startAnimation(fab_close);
+            fab3.startAnimation(fab_close);
             fab1.setClickable(false);
             fab2.setClickable(false);
+            fab3.setClickable(false);
             isFabOpen = false;
         } else {
             fab1.startAnimation(fab_open);
             fab2.startAnimation(fab_open);
+            fab3.startAnimation(fab_open);
             fab1.setClickable(true);
             fab2.setClickable(true);
+            fab3.setClickable(true);
             isFabOpen = true;
         }
     }
@@ -360,7 +601,64 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
-            Snackbar.make(this.mViewPager, "설정할 메뉴가 없습니다.", Snackbar.LENGTH_LONG)
+            // Json 파일 테스트용 저장
+            String str =
+                    "[{'name':'Pak Jeong-Hun','phonenumber':'010-3659-1044','photo':'man1','value':0}," +
+                            "{'name':'Won Jung-Eun','phonenumber':'033-8015-2264','photo':'woman3','value':1000}," +
+                            "{'name':'Hong Byung-Hoon','phonenumber':'052-1624-1104','photo':'man3','value':-1000}," +
+                            "{'name':'Sop Kyong-Su','phonenumber':'010-4728-5356','photo':'man2','value':0}," +
+                            "{'name':'Chom Kang-Dae','phonenumber':'062-4032-6077','photo':'man2','value':0}," +
+                            "{'name':'Chong Minjun','phonenumber':'051-7086-4133','photo':'man3','value':0}," +
+                            "{'name':'Chu Song-Ho','phonenumber':'1588-7473','photo':'man1','value':0}," +
+                            "{'name':'Chu Chi-Won','phonenumber':'02-2585-1613','photo':'man1','value':0}," +
+                            "{'name':'Eoh Ji-Hoon','phonenumber':'02-1265-5822','photo':'man3','value':0}," +
+                            "{'name':'An Ji-Won','phonenumber':'040-9425-5912','photo':'woman1','value':0}," +
+                            "{'name':'Tan Hyun-Ju','phonenumber':'1588-3958','photo':'man1','value':0}," +
+                            "{'name':'Hung Min-Yung','phonenumber':'047-3833-5090','photo':'woman2','value':0}," +
+                            "{'name':'Ri Mi-Sook','phonenumber':'068-5790-5717','photo':'woman3','value':0}," +
+                            "{'name':'Chegal Suk-Ja','phonenumber':'1588-9206','photo':'woman3','value':0}," +
+                            "{'name':'Pong Yi','phonenumber':'1588-9545','photo':'man1','value':0}," +
+                            "{'name':'Chung Yu-Ni','phonenumber':'1588-7875','photo':'woman1','value':0}," +
+                            "{'name':'Hwan Kyong-Ja','phonenumber':'02-4179-7747','photo':'woman2','value':0}," +
+                            "{'name':'Ogum Un-Ju','phonenumber':'010-4485-3333','photo':'woman1','value':0}," +
+                            "{'name':'Mangjol Hyon-Ju','phonenumber':'053-8542-5040','photo':'woman3','value':0}," +
+                            "{'name':'Mae Tae-Young','phonenumber':'010-9034-0169','photo':'man1','value':0}," +
+                            "{'name':'Pom Ji-Hun','phonenumber':'1588-1277','photo':'man3','value':0}," +
+                            "{'name':'Ki Chuwon','phonenumber':'02-8037-5149','photo':'man2','value':0}," +
+                            "{'name':'Kun Min-Jun','phonenumber':'031-9784-3958','photo':'man3','value':0}," +
+                            "{'name':'Chang Kang-Dae','phonenumber':'068-8434-2971','photo':'man2','value':0}," +
+                            "{'name':'Kim Min-Su','phonenumber':'059-8651-7823','photo':'man1','value':0}," +
+                            "{'name':'Pang Min-Kyu','phonenumber':'054-8456-3648','photo':'man1','value':0}," +
+                            "{'name':'Chu Kyong-Su','phonenumber':'064-3639-9267','photo':'man3','value':0}," +
+                            "{'name':'Nang Suk-Chul','phonenumber':'067-0436-4190','photo':'man2','value':0}," +
+                            "{'name':'Ru Dong-Jun','phonenumber':'010-9296-0249','photo':'man3','value':0}," +
+                            "{'name':'Sung Sang-Min','phonenumber':'042-3650-9642','photo':'man2','value':0}," +
+                            "{'name':'Yun Myung-Hee','phonenumber':'052-4368-7394','photo':'woman1','value':0}," +
+                            "{'name':'Min Se-Yeon','phonenumber':'02-4893-7244','photo':'woman2','value':0}," +
+                            "{'name':'Pom Mi-Suk','phonenumber':'033-7327-2767','photo':'man3','value':0}," +
+                            "{'name':'Yang Ja-Hyun','phonenumber':'054-9152-2803','photo':'woman2','value':0}," +
+                            "{'name':'Pung Da-Hee','phonenumber':'010-3425-5002','photo':'woman3','value':0}," +
+                            "{'name':'Kye Eun-Ah','phonenumber':'070-5128-4608','photo':'woman1','value':0}," +
+                            "{'name':'Kun Sujin','phonenumber':'02-4429-7810','photo':'woman2','value':0}," +
+                            "{'name':'Pae Ae','phonenumber':'070-8311-5537','photo':'man1','value':0}," +
+                            "{'name':'Ra Hwi-Hyang','phonenumber':'1588-0132','photo':'man3','value':0}," +
+                            "{'name':'Sip Eun-Bi','phonenumber':'1588-9463','photo':'woman3','value':0}," +
+                            "{'name':'Ogum Yong-Gi','phonenumber':'046-0213-2011','photo':'man2','value':0}," +
+                            "{'name':'Chang Seong-Hyeon','phonenumber':'032-9671-4492','photo':'man3','value':0}," +
+                            "{'name':'Om Young-Soo','phonenumber':'036-3070-9286','photo':'man1','value':0}," +
+                            "{'name':'Hwang Seung-Woo','phonenumber':'036-4224-7732','photo':'man3','value':0}," +
+                            "{'name':'Tae Song-Ho','phonenumber':'066-0719-8085','photo':'man2','value':0}," +
+                            "{'name':'Pyong Sang-Chul','phonenumber':'02-0421-3789','photo':'man2','value':0}," +
+                            "{'name':'Ko Myung-Hee','phonenumber':'053-3212-4003','photo':'woman2','value':0}," +
+                            "{'name':'Chegal Jung-Nam','phonenumber':'1588-9258','photo':'man1','value':0}," +
+                            "{'name':'Nae Kwang-Jo','phonenumber':'061-9388-5237','photo':'man3','value':0}," +
+                            "{'name':'Kwok Sunghyon','phonenumber':'031-3499-3751','photo':'man2','value':0}]";
+
+
+            //JSON 파일 리셋
+            writeToContactFile(str);
+
+            Snackbar.make(this.mViewPager, "연락처가 초기화되었습니다.", Snackbar.LENGTH_LONG)
                     .setAction("Action", null).show();
             return true;
         }
@@ -381,7 +679,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             outputStreamWriter.close();
         }
         catch (IOException e) {
-            Toast.makeText(this, "Exception: File write failed", Toast.LENGTH_SHORT).show();
+            Log.e("WriteFile", "Exception: File write failed (contact.json)");
         }
     }
 
@@ -408,9 +706,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         }
         catch (FileNotFoundException e) {
-            Toast.makeText(this, "Exception: File not found", Toast.LENGTH_SHORT).show();
+            Log.e("ReadFile", "Exception: File not found (contact.json)");
         } catch (IOException e) {
-            Toast.makeText(this, "Exception: Can not read file", Toast.LENGTH_SHORT).show();
+            Log.e("ReadFile", "Exception: Can not read file (contact.json)");
         }
 
         return ret;
