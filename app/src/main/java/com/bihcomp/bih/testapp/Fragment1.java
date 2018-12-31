@@ -1,16 +1,19 @@
 package com.bihcomp.bih.testapp;
 
+import android.Manifest;
 import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.text.Editable;
 import android.text.InputType;
@@ -348,8 +351,16 @@ public class Fragment1 extends Fragment {
                                 })
                                 .setNeutralButton("통화", new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dlg, int sumthin) {
-                                        Intent callintent = new Intent(Intent.ACTION_DIAL, Uri.parse("tel: "+pn));
-                                        startActivity(callintent);
+                                        int permissionCheck = ContextCompat.checkSelfPermission(getContext(), Manifest.permission.CALL_PHONE);
+
+                                        if(permissionCheck== PackageManager.PERMISSION_DENIED){
+                                            Intent callintent = new Intent(Intent.ACTION_DIAL, Uri.parse("tel: "+pn));
+                                            startActivity(callintent);
+                                        }else{
+                                            Intent callintent = new Intent(Intent.ACTION_CALL, Uri.parse("tel: "+pn));
+                                            startActivity(callintent);
+                                        }
+
                                     }
                                 })
                                 .show();

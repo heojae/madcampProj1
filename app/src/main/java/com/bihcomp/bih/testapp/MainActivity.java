@@ -339,7 +339,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 } else if (mViewPager.getCurrentItem() == 1) {
 
                 } else if (mViewPager.getCurrentItem() == 2) {
-
+                    mViewPager.setCurrentItem(0);
+                    Snackbar.make(this.mViewPager, "값을 추가할 연락처를 선택하세요.", Snackbar.LENGTH_LONG)
+                            .setAction("Action", null).show();
                 }
                 break;
             case R.id.fab2:
@@ -427,7 +429,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 } else if (mViewPager.getCurrentItem() == 1) {
 
                 } else if (mViewPager.getCurrentItem() == 2) {
-
+                    mViewPager.setCurrentItem(0);
+                    Snackbar.make(this.mViewPager, "값을 제거할 연락처를 선택하세요.", Snackbar.LENGTH_LONG)
+                            .setAction("Action", null).show();
                 }
                 break;
             case R.id.fab3:

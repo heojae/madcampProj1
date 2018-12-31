@@ -100,11 +100,13 @@ public class Fragment3 extends Fragment {
 
                 if(value == 0)
                 {
+                    /*
                     Pair<String, String> tempPair = new Pair<String, String>(name,""+value);
                     titleValue.add(tempPair);
 
                     titleArray.add(name);
                     valueArray.add(""+value);
+                    */
                 }
                 else if(value > 0)
                 {
