@@ -51,6 +51,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      * Target API 22 이상으로, 수동 권한 요청
      ***************************************************/
     private static final int MY_PERMISSIONS_REQUEST_READ_EXT_STORAGE = 1;
+    private static final int MY_PERMISSIONS_REQUEST_CALL_PHONE = 2;
+    private static final int MY_PERMISSIONS_REQUEST_READ_CONTACTS = 3;
 
 
 
@@ -85,7 +87,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
          * Target API 22 이상으로, 수동 권한 요청
          ***************************************************/
 
-        requestReadExternalStoragePermission();
+        requestAllPermission();
 
 
 
@@ -324,6 +326,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                             tempstr = tempstr.replace(expectedstrs[i], "");
                                             tempstr = tempstr.replace(",,", ",");
                                         }
+
+                                        // 데이터를 모두 지웠을 경우 처리
+                                        if (tempstr.equals("[]"))
+                                            tempstr = "";
+
                                         writeToContactFile(tempstr);
                                         change = true;
                                     }
@@ -372,7 +379,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                 } else if (mViewPager.getCurrentItem() == 2) {
                     mViewPager.setCurrentItem(0);
-                    Snackbar.make(this.mViewPager, "값을 추가할 연락처를 선택하세요.", Snackbar.LENGTH_LONG)
+                    Snackbar.make(this.mViewPager, "값을 제거할 연락처를 선택하세요.", Snackbar.LENGTH_LONG)
                             .setAction("Action", null).show();
                 }
                 break;
@@ -436,12 +443,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 mViewPager.setCurrentItem(0);
                             } else {
                                 String tempstr = readFromContactFile();
-                                tempstr = tempstr.replace("]","");
-                                String addstr =  ",{'name':'" + username + "','phonenumber':'" + userphonenumber + "','photo':'man1','value':0}]";
-                                tempstr = tempstr + addstr;
+
+                                if (tempstr.equals(""))
+                                {
+                                    tempstr = "[{'name':'" + username + "','phonenumber':'" + userphonenumber + "','photo':'man1','value':0}]";
+                                }
+                                else
+                                {
+                                    tempstr = tempstr.replace("]","");
+                                    String addstr =  ",{'name':'" + username + "','phonenumber':'" + userphonenumber + "','photo':'man1','value':0}]";
+                                    tempstr = tempstr + addstr;
+                                    Log.d("addstr", addstr);
+                                }
                                 writeToContactFile(tempstr);
-                                //Toast.makeText(getParent(), addstr, Toast.LENGTH_SHORT).show();
-                                Log.d("addstr", addstr);
                                 mViewPager.setCurrentItem(0);
                             }
 
@@ -470,7 +484,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                 } else if (mViewPager.getCurrentItem() == 2) {
                     mViewPager.setCurrentItem(0);
-                    Snackbar.make(this.mViewPager, "값을 제거할 연락처를 선택하세요.", Snackbar.LENGTH_LONG)
+                    Snackbar.make(this.mViewPager, "값을 추가할 연락처를 선택하세요.", Snackbar.LENGTH_LONG)
                             .setAction("Action", null).show();
                 }
                 break;
@@ -493,7 +507,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 } else if (mViewPager.getCurrentItem() == 1) {
 
                 } else if (mViewPager.getCurrentItem() == 2) {
-
+                    Snackbar.make(this.mViewPager, "b^.^b", Snackbar.LENGTH_LONG)
+                            .setAction("Action", null).show();
                 }
                 break;
         }
@@ -514,20 +529,26 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             cursor.close();
 
             String tempstr = readFromContactFile();
-            tempstr = tempstr.replace("]","");
-            String addstr =  ",{'name':'" + sName + "','phonenumber':'" + sNumber + "','photo':'man1','value':0}]";
-            tempstr = tempstr + addstr;
+
+            if (tempstr.equals(""))
+            {
+                tempstr = "[{'name':'" + sName + "','phonenumber':'" + sNumber + "','photo':'man1','value':0}]";
+            }
+            else
+            {
+                tempstr = tempstr.replace("]","");
+                String addstr =  ",{'name':'" + sName + "','phonenumber':'" + sNumber + "','photo':'man1','value':0}]";
+                tempstr = tempstr + addstr;
+                Log.d("addstr", addstr);
+            }
             writeToContactFile(tempstr);
-            //Toast.makeText(getParent(), addstr, Toast.LENGTH_SHORT).show();
-            Log.d("addstr", addstr);
 
             Snackbar.make(this.mViewPager, sName + " 님의 연락처가 추가되었습니다.", Snackbar.LENGTH_LONG)
                     .setAction("Action", null).show();
 
-
-
+            mViewPager.setCurrentItem(0);
         }
-        mViewPager.setCurrentItem(0);
+
         super.onActivityResult(requestCode, resultCode, data);
     }
 
@@ -721,27 +742,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      * Target API 22 이상으로, 수동 권한 요청
      ***************************************************/
 
-    private void requestReadExternalStoragePermission() {
+    private void requestAllPermission() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) !=
                 PackageManager.PERMISSION_GRANTED) {
-
-            // Should we show an explanation?
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
-                    Manifest.permission.READ_EXTERNAL_STORAGE)) {
-
-                // Show an expanation to the user *asynchronously* -- don't block
-                // this thread waiting for the user's response! After the user
-                // sees the explanation, try again to request the permission.
-
-            } else {
-
-                // No explanation needed, we can request the permission.
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
-                        MY_PERMISSIONS_REQUEST_READ_EXT_STORAGE);
-                // MY_PERMISSIONS_REQUEST_READ_EXT_STORAGE is an
-                // app-defined int constant. The callback method gets the
-                // result of the request.
-            }
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.READ_EXTERNAL_STORAGE)) { }
+            else { ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, MY_PERMISSIONS_REQUEST_READ_EXT_STORAGE); }
+        }
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE) !=
+                PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.CALL_PHONE)) { }
+            else { ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CALL_PHONE}, MY_PERMISSIONS_REQUEST_CALL_PHONE); }
+        }
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS) !=
+                PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.READ_CONTACTS)) { }
+            else { ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_CONTACTS}, MY_PERMISSIONS_REQUEST_READ_CONTACTS); }
         }
     }
 
@@ -751,20 +766,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         switch (requestCode) {
             case MY_PERMISSIONS_REQUEST_READ_EXT_STORAGE : {
                 // If request is cancelled, the result arrays are empty.
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    // permission was granted, yay! Do the
-                    // contacts-related task you need to do.
-
-                } else {
-
-                    // permission denied, boo! Disable the
-                    // functionality that depends on this permission.
-                }
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) { }
+                else { }
+                return;
+            }
+            case MY_PERMISSIONS_REQUEST_CALL_PHONE : {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) { }
+                else { }
+                return;
+            }
+            case MY_PERMISSIONS_REQUEST_READ_CONTACTS : {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) { }
+                else { }
                 return;
             }
 
-            // other 'case' lines to check for other
-            // permissions this app might request
         }
     }
 
