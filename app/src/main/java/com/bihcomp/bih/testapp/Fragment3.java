@@ -7,6 +7,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.util.Pair;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -68,6 +69,7 @@ public class Fragment3 extends Fragment {
         View view = inflater.inflate(R.layout.fragment_fragment3,container,false);
 
 
+
         recyclerView = (RecyclerView) view.findViewById(R.id.myRecyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
@@ -76,6 +78,36 @@ public class Fragment3 extends Fragment {
         adapter.setParentAndIconExpandOnClick(true);
 
         recyclerView.setAdapter(adapter);
+
+        // RecyclerView 클릭 처리
+        recyclerView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                Toast.makeText(getContext(),"RecyclerView",Toast.LENGTH_SHORT).show();
+                //int itemPosition = recyclerView.getChildLayoutPosition(v);
+                long contentslist = recyclerView.getChildItemId(v);
+                Toast.makeText(getContext(),"contentslist : " + contentslist,Toast.LENGTH_SHORT).show();
+
+
+
+
+                return false;
+            }
+        });
+
+
+
+
+
+
+
+
+
+        // 회계기록 없을 때 처리
+        if (recyclerView.getAdapter().getItemCount() != 0)
+            view.findViewById(R.id.LayoutMoneyListNotFound).setVisibility(View.GONE);
+        else
+            view.findViewById(R.id.LayoutMoneyListNotFound).setVisibility(View.VISIBLE);
 
 
         return view;

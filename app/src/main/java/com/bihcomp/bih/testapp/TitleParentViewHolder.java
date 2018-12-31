@@ -20,5 +20,8 @@ public class TitleParentViewHolder extends ParentViewHolder {
         super(itemView);
         _textView = (TextView)itemView.findViewById(R.id.parentTitle);
         _imageButton = (ImageButton) itemView.findViewById(R.id.expandArrow);
+
+
+
     }
 }

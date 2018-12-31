@@ -51,6 +51,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      * Target API 22 이상으로, 수동 권한 요청
      ***************************************************/
     private static final int MY_PERMISSIONS_REQUEST_READ_EXT_STORAGE = 1;
+    private static final int MY_PERMISSIONS_REQUEST_CALL_PHONE = 2;
+    private static final int MY_PERMISSIONS_REQUEST_READ_CONTACTS = 3;
 
 
 
@@ -85,7 +87,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
          * Target API 22 이상으로, 수동 권한 요청
          ***************************************************/
 
-        requestReadExternalStoragePermission();
+        requestAllPermission();
 
 
 
@@ -324,6 +326,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                             tempstr = tempstr.replace(expectedstrs[i], "");
                                             tempstr = tempstr.replace(",,", ",");
                                         }
+
+                                        // 데이터를 모두 지웠을 경우 처리
+                                        if (tempstr.equals("[]"))
+                                            tempstr = "";
+
                                         writeToContactFile(tempstr);
                                         change = true;
                                     }
@@ -372,7 +379,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                 } else if (mViewPager.getCurrentItem() == 2) {
                     mViewPager.setCurrentItem(0);
-                    Snackbar.make(this.mViewPager, "값을 추가할 연락처를 선택하세요.", Snackbar.LENGTH_LONG)
+                    Snackbar.make(this.mViewPager, "값을 제거할 연락처를 선택하세요.", Snackbar.LENGTH_LONG)
                             .setAction("Action", null).show();
                 }
                 break;
@@ -436,12 +443,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 mViewPager.setCurrentItem(0);
                             } else {
                                 String tempstr = readFromContactFile();
-                                tempstr = tempstr.replace("]","");
-                                String addstr =  ",{'name':'" + username + "','phonenumber':'" + userphonenumber + "','photo':'man1','value':0}]";
-                                tempstr = tempstr + addstr;
+
+                                if (tempstr.equals(""))
+                                {
+                                    tempstr = "[{'name':'" + username + "','phonenumber':'" + userphonenumber + "','photo':'man1','value':0}]";
+                                }
+                                else
+                                {
+                                    tempstr = tempstr.replace("]","");
+                                    String addstr =  ",{'name':'" + username + "','phonenumber':'" + userphonenumber + "','photo':'man1','value':0}]";
+                                    tempstr = tempstr + addstr;
+                                    Log.d("addstr", addstr);
+                                }
                                 writeToContactFile(tempstr);
-                                //Toast.makeText(getParent(), addstr, Toast.LENGTH_SHORT).show();
-                                Log.d("addstr", addstr);
                                 mViewPager.setCurrentItem(0);
                             }
 
@@ -472,7 +486,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                 } else if (mViewPager.getCurrentItem() == 2) {
                     mViewPager.setCurrentItem(0);
-                    Snackbar.make(this.mViewPager, "값을 제거할 연락처를 선택하세요.", Snackbar.LENGTH_LONG)
+                    Snackbar.make(this.mViewPager, "값을 추가할 연락처를 선택하세요.", Snackbar.LENGTH_LONG)
                             .setAction("Action", null).show();
                 }
                 break;
@@ -495,7 +509,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 } else if (mViewPager.getCurrentItem() == 1) {
 
                 } else if (mViewPager.getCurrentItem() == 2) {
-
+                    Snackbar.make(this.mViewPager, "b^.^b", Snackbar.LENGTH_LONG)
+                            .setAction("Action", null).show();
                 }
                 break;
         }
@@ -516,16 +531,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             cursor.close();
 
             String tempstr = readFromContactFile();
-            tempstr = tempstr.replace("]","");
-            String addstr =  ",{'name':'" + sName + "','phonenumber':'" + sNumber + "','photo':'man1','value':0}]";
-            tempstr = tempstr + addstr;
+
+            if (tempstr.equals(""))
+            {
+                tempstr = "[{'name':'" + sName + "','phonenumber':'" + sNumber + "','photo':'man1','value':0}]";
+            }
+            else
+            {
+                tempstr = tempstr.replace("]","");
+                String addstr =  ",{'name':'" + sName + "','phonenumber':'" + sNumber + "','photo':'man1','value':0}]";
+                tempstr = tempstr + addstr;
+                Log.d("addstr", addstr);
+            }
             writeToContactFile(tempstr);
-            //Toast.makeText(getParent(), addstr, Toast.LENGTH_SHORT).show();
-            Log.d("addstr", addstr);
 
             Snackbar.make(this.mViewPager, sName + " 님의 연락처가 추가되었습니다.", Snackbar.LENGTH_LONG)
                     .setAction("Action", null).show();
-
 
             mViewPager.setCurrentItem(0);
         }
@@ -609,8 +630,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             "{'name':'Won Jung-Eun','phonenumber':'033-8015-2264','photo':'woman3','value':1000}," +
                             "{'name':'Hong Byung-Hoon','phonenumber':'052-1624-1104','photo':'man3','value':-1000}," +
                             "{'name':'Sop Kyong-Su','phonenumber':'010-4728-5356','photo':'man2','value':0}," +
-                            "{'name':'Chom Kang-Dae','phonenumber':'062-4032-6077','photo':'man2','value':0}," +
-                            "{'name':'Chong Minjun','phonenumber':'051-7086-4133','photo':'man3','value':0}," +
+                            "{'name':'Chom Kang-Dae','phonenumber':'062-4032-6077','photo':'man2','value':2000}," +
+                            "{'name':'Chong Minjun','phonenumber':'051-7086-4133','photo':'man3','value':2000}," +
                             "{'name':'Chu Song-Ho','phonenumber':'1588-7473','photo':'man1','value':0}," +
                             "{'name':'Chu Chi-Won','phonenumber':'02-2585-1613','photo':'man1','value':0}," +
                             "{'name':'Eoh Ji-Hoon','phonenumber':'02-1265-5822','photo':'man3','value':0}," +
@@ -628,7 +649,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             "{'name':'Pom Ji-Hun','phonenumber':'1588-1277','photo':'man3','value':0}," +
                             "{'name':'Ki Chuwon','phonenumber':'02-8037-5149','photo':'man2','value':0}," +
                             "{'name':'Kun Min-Jun','phonenumber':'031-9784-3958','photo':'man3','value':0}," +
-                            "{'name':'Chang Kang-Dae','phonenumber':'068-8434-2971','photo':'man2','value':0}," +
+                            "{'name':'Chang Kang-Dae','phonenumber':'068-8434-2971','photo':'man2','value':-20000}," +
                             "{'name':'Kim Min-Su','phonenumber':'059-8651-7823','photo':'man1','value':0}," +
                             "{'name':'Pang Min-Kyu','phonenumber':'054-8456-3648','photo':'man1','value':0}," +
                             "{'name':'Chu Kyong-Su','phonenumber':'064-3639-9267','photo':'man3','value':0}," +
@@ -652,7 +673,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             "{'name':'Tae Song-Ho','phonenumber':'066-0719-8085','photo':'man2','value':0}," +
                             "{'name':'Pyong Sang-Chul','phonenumber':'02-0421-3789','photo':'man2','value':0}," +
                             "{'name':'Ko Myung-Hee','phonenumber':'053-3212-4003','photo':'woman2','value':0}," +
-                            "{'name':'Chegal Jung-Nam','phonenumber':'1588-9258','photo':'man1','value':0}," +
+                            "{'name':'Chegal Jung-Nam','phonenumber':'1588-9258','photo':'man1','value':20000}," +
                             "{'name':'Nae Kwang-Jo','phonenumber':'061-9388-5237','photo':'man3','value':0}," +
                             "{'name':'Kwok Sunghyon','phonenumber':'031-3499-3751','photo':'man2','value':0}]";
 
@@ -723,27 +744,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      * Target API 22 이상으로, 수동 권한 요청
      ***************************************************/
 
-    private void requestReadExternalStoragePermission() {
+    private void requestAllPermission() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) !=
                 PackageManager.PERMISSION_GRANTED) {
-
-            // Should we show an explanation?
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
-                    Manifest.permission.READ_EXTERNAL_STORAGE)) {
-
-                // Show an expanation to the user *asynchronously* -- don't block
-                // this thread waiting for the user's response! After the user
-                // sees the explanation, try again to request the permission.
-
-            } else {
-
-                // No explanation needed, we can request the permission.
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
-                        MY_PERMISSIONS_REQUEST_READ_EXT_STORAGE);
-                // MY_PERMISSIONS_REQUEST_READ_EXT_STORAGE is an
-                // app-defined int constant. The callback method gets the
-                // result of the request.
-            }
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.READ_EXTERNAL_STORAGE)) { }
+            else { ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, MY_PERMISSIONS_REQUEST_READ_EXT_STORAGE); }
+        }
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE) !=
+                PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.CALL_PHONE)) { }
+            else { ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CALL_PHONE}, MY_PERMISSIONS_REQUEST_CALL_PHONE); }
+        }
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS) !=
+                PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.READ_CONTACTS)) { }
+            else { ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_CONTACTS}, MY_PERMISSIONS_REQUEST_READ_CONTACTS); }
         }
     }
 
@@ -753,20 +768,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         switch (requestCode) {
             case MY_PERMISSIONS_REQUEST_READ_EXT_STORAGE : {
                 // If request is cancelled, the result arrays are empty.
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    // permission was granted, yay! Do the
-                    // contacts-related task you need to do.
-
-                } else {
-
-                    // permission denied, boo! Disable the
-                    // functionality that depends on this permission.
-                }
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) { }
+                else { }
+                return;
+            }
+            case MY_PERMISSIONS_REQUEST_CALL_PHONE : {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) { }
+                else { }
+                return;
+            }
+            case MY_PERMISSIONS_REQUEST_READ_CONTACTS : {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) { }
+                else { }
                 return;
             }
 
-            // other 'case' lines to check for other
-            // permissions this app might request
         }
     }
 
