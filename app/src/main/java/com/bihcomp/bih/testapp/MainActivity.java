@@ -628,8 +628,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             "{'name':'Won Jung-Eun','phonenumber':'033-8015-2264','photo':'woman3','value':1000}," +
                             "{'name':'Hong Byung-Hoon','phonenumber':'052-1624-1104','photo':'man3','value':-1000}," +
                             "{'name':'Sop Kyong-Su','phonenumber':'010-4728-5356','photo':'man2','value':0}," +
-                            "{'name':'Chom Kang-Dae','phonenumber':'062-4032-6077','photo':'man2','value':0}," +
-                            "{'name':'Chong Minjun','phonenumber':'051-7086-4133','photo':'man3','value':0}," +
+                            "{'name':'Chom Kang-Dae','phonenumber':'062-4032-6077','photo':'man2','value':2000}," +
+                            "{'name':'Chong Minjun','phonenumber':'051-7086-4133','photo':'man3','value':2000}," +
                             "{'name':'Chu Song-Ho','phonenumber':'1588-7473','photo':'man1','value':0}," +
                             "{'name':'Chu Chi-Won','phonenumber':'02-2585-1613','photo':'man1','value':0}," +
                             "{'name':'Eoh Ji-Hoon','phonenumber':'02-1265-5822','photo':'man3','value':0}," +
@@ -647,7 +647,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             "{'name':'Pom Ji-Hun','phonenumber':'1588-1277','photo':'man3','value':0}," +
                             "{'name':'Ki Chuwon','phonenumber':'02-8037-5149','photo':'man2','value':0}," +
                             "{'name':'Kun Min-Jun','phonenumber':'031-9784-3958','photo':'man3','value':0}," +
-                            "{'name':'Chang Kang-Dae','phonenumber':'068-8434-2971','photo':'man2','value':0}," +
+                            "{'name':'Chang Kang-Dae','phonenumber':'068-8434-2971','photo':'man2','value':-20000}," +
                             "{'name':'Kim Min-Su','phonenumber':'059-8651-7823','photo':'man1','value':0}," +
                             "{'name':'Pang Min-Kyu','phonenumber':'054-8456-3648','photo':'man1','value':0}," +
                             "{'name':'Chu Kyong-Su','phonenumber':'064-3639-9267','photo':'man3','value':0}," +
@@ -671,7 +671,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             "{'name':'Tae Song-Ho','phonenumber':'066-0719-8085','photo':'man2','value':0}," +
                             "{'name':'Pyong Sang-Chul','phonenumber':'02-0421-3789','photo':'man2','value':0}," +
                             "{'name':'Ko Myung-Hee','phonenumber':'053-3212-4003','photo':'woman2','value':0}," +
-                            "{'name':'Chegal Jung-Nam','phonenumber':'1588-9258','photo':'man1','value':0}," +
+                            "{'name':'Chegal Jung-Nam','phonenumber':'1588-9258','photo':'man1','value':20000}," +
                             "{'name':'Nae Kwang-Jo','phonenumber':'061-9388-5237','photo':'man3','value':0}," +
                             "{'name':'Kwok Sunghyon','phonenumber':'031-3499-3751','photo':'man2','value':0}]";
 

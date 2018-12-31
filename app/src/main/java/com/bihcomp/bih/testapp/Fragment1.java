@@ -48,6 +48,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.List;
 
 import static java.lang.Math.min;
 
@@ -114,6 +115,8 @@ public class Fragment1 extends Fragment {
                         final String name = ent.getName();
                         final String pn = ent.getPhoneNo().replaceAll("-", "");
                         final String phonn = ent.getPhoneNo();
+                        final String photoname = ent.getPhotoName();
+                        final int personvalue = ent.getPersonValue();
                         final int _photo = ent.getPhotoId()!=-1?ent.getPhotoId():R.drawable.photo;
                         final int posinstr[] = new int[2];
 
@@ -280,32 +283,65 @@ public class Fragment1 extends Fragment {
                                         });
                                         cnalert.setNeutralButton("사진 변경",new DialogInterface.OnClickListener() {
                                             public void onClick(DialogInterface dialog, int whichButton) {
+                                                final List<String> ListItems = new ArrayList<>();
+                                                ListItems.add("남자1");
+                                                ListItems.add("남자2");
+                                                ListItems.add("남자3");
+                                                ListItems.add("여자1");
+                                                ListItems.add("여자2");
+                                                ListItems.add("여자3");
+                                                final CharSequence[] items =  ListItems.toArray(new String[ ListItems.size()]);
+
+                                                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                                                builder.setTitle("연락처 사진 선택");
+                                                builder.setItems(items, new DialogInterface.OnClickListener() {
+                                                    public void onClick(DialogInterface dialog, int pos) {
+                                                        String selectedText = items[pos].toString();
+                                                        String currentText = "{'name':'" + name + "','phonenumber':'" + phonn + "','photo':'" + photoname + "','value':" + personvalue + "}";
+                                                        String changedText = "";
+                                                        if (selectedText.equals("남자1")) {
+                                                            changedText = "{'name':'" + name + "','phonenumber':'" + phonn + "','photo':'" + "man1" + "','value':" + personvalue + "}";
+                                                        } else if (selectedText.equals("남자2")) {
+                                                            changedText = "{'name':'" + name + "','phonenumber':'" + phonn + "','photo':'" + "man2" + "','value':" + personvalue + "}";
+                                                        } else if (selectedText.equals("남자3")) {
+                                                            changedText = "{'name':'" + name + "','phonenumber':'" + phonn + "','photo':'" + "man3" + "','value':" + personvalue + "}";
+                                                        } else if (selectedText.equals("여자1")) {
+                                                            changedText = "{'name':'" + name + "','phonenumber':'" + phonn + "','photo':'" + "woman1" + "','value':" + personvalue + "}";
+                                                        } else if (selectedText.equals("여자2")) {
+                                                            changedText = "{'name':'" + name + "','phonenumber':'" + phonn + "','photo':'" + "woman2" + "','value':" + personvalue + "}";
+                                                        } else if (selectedText.equals("여자3")) {
+                                                            changedText = "{'name':'" + name + "','phonenumber':'" + phonn + "','photo':'" + "woman3" + "','value':" + personvalue + "}";
+                                                        }
+
+                                                        Log.d("selectedText", selectedText);
+                                                        Log.d("currentText", currentText);
+                                                        Log.d("changedText", changedText);
+
+                                                        String getstr = readFromContactFile();
+
+                                                        Log.d("getstr", getstr);
+
+                                                        getstr = getstr.replace(currentText, changedText);
+                                                        writeToContactFile(getstr);
+
+                                                        Log.d("getstr", getstr);
+
+                                                        EditText editTexttemp = (EditText) tempview[0].findViewById(R.id.editTextContact);
+                                                        LinearLayout searchLinearLayouttemp = tempview[0].findViewById(R.id.searchLinearLayout);
+                                                        if (searchLinearLayouttemp.getVisibility() == View.VISIBLE)
+                                                            refreshContactList(editTexttemp.getText().toString());
+                                                        else
+                                                            refreshContactList();
+
+                                                        contactAdapter.notifyDataSetChanged();
+                                                        mListView.invalidateViews();
 
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+                                                    }
+                                                });
+                                                builder.show();
 
 
 

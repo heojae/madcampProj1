@@ -55,4 +55,11 @@ public class MyAdapter extends ExpandableRecyclerAdapter<TitleParentViewHolder,T
         titleChildViewHolder.option2.setText(title.getOption2());
 
     }
+
+
+
+
+
+
+
 }
