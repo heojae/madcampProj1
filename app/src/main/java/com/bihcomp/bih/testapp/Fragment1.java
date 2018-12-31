@@ -357,6 +357,19 @@ public class Fragment1 extends Fragment {
                                                                     tempstr = tempstr.replace(expectedstrs[i], "");
                                                                     tempstr = tempstr.replace(",,", ",");
                                                                 }
+
+                                                                //Toast.makeText(getContext(), tempstr, Toast.LENGTH_SHORT).show();
+
+                                                                // 데이터를 모두 지웠을 경우 처리
+                                                                if (tempstr.equals("[]"))
+                                                                    tempstr = "";
+
+                                                                // 연락처 있을 때 없을 때 처리
+                                                                if (tempstr.length() != 0)
+                                                                    tempview[0].findViewById(R.id.LayoutContactNotFound).setVisibility(View.GONE);
+                                                                else
+                                                                    tempview[0].findViewById(R.id.LayoutContactNotFound).setVisibility(View.VISIBLE);
+
                                                                 writeToContactFile(tempstr);
                                                                 contactAdapter.remove(ent);
                                                                 contactAdapter.notifyDataSetChanged();
@@ -940,6 +953,12 @@ public class Fragment1 extends Fragment {
             Log.d("JSONArray", "Parsing Error Currupt");
         }
 
+        // 연락처 있을 때 없을 때 처리
+        if (contactList.size() != 0 || contactStr.length() != 0)
+            tempview[0].findViewById(R.id.LayoutContactNotFound).setVisibility(View.GONE);
+        else
+            tempview[0].findViewById(R.id.LayoutContactNotFound).setVisibility(View.VISIBLE);
+
         // 어뎁터 설정
 
         Collections.sort(contactList, myComparatorName);
@@ -1097,6 +1116,13 @@ public class Fragment1 extends Fragment {
         contactList.clear();
         for (int i = 0; i < tempContactList.size(); i++)
             contactList.add(tempContactList.get(i));
+
+
+        // 연락처 있을 때 없을 때 처리
+        if (contactList.size() != 0 || contactStr.length() != 0)
+            tempview[0].findViewById(R.id.LayoutContactNotFound).setVisibility(View.GONE);
+        else
+            tempview[0].findViewById(R.id.LayoutContactNotFound).setVisibility(View.VISIBLE);
 
 
         contactAdapter = new contactArrayAdapter(getContext(), R.layout.listview_contact, R.id.eName, contactList);
