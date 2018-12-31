@@ -162,10 +162,8 @@ public class Fragment1 extends Fragment {
                                         cnalert.setTitle("연락처 수정");
                                         cnalert.setMessage("수정할 이름과 전화번호를 입력해주세요.");
 
-
                                         final LinearLayout alertlayout = new LinearLayout(getContext());
                                         alertlayout.setOrientation(LinearLayout.VERTICAL);
-
 
                                         final TextView textViewName = new TextView(getContext());
                                         textViewName.setText("이름 : ");
@@ -278,6 +276,41 @@ public class Fragment1 extends Fragment {
 
                                         cnalert.setNegativeButton("취소",new DialogInterface.OnClickListener() {
                                             public void onClick(DialogInterface dialog, int whichButton) {
+                                            }
+                                        });
+                                        cnalert.setNeutralButton("사진 변경",new DialogInterface.OnClickListener() {
+                                            public void onClick(DialogInterface dialog, int whichButton) {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
                                             }
                                         });
 
@@ -430,13 +463,27 @@ public class Fragment1 extends Fragment {
                                         AlertDialog.Builder cvalert = new AlertDialog.Builder(getContext());
                                         cvalert.setTitle(name + " 님의 금액 수정");
                                         cvalert.setMessage("가감할 금액을 입력하세요.");
+
                                         final EditText editTextInput = new EditText(getContext());
                                         editTextInput.setInputType(InputType.TYPE_CLASS_TEXT);
                                         editTextInput.setRawInputType(Configuration.KEYBOARD_12KEY);
-                                        editTextInput.setHint("-1000(원)");
-                                        cvalert.setView(editTextInput);
+                                        editTextInput.setHint("-1000(원)                                        ");
+
+                                        final TextView textViewtemp = new TextView(getContext());
+                                        textViewtemp.setText("        ");
+
+                                        final LinearLayout wraplayout = new LinearLayout(getContext());
+                                        wraplayout.setOrientation(LinearLayout.HORIZONTAL);
+                                        wraplayout.addView(textViewtemp);
+                                        wraplayout.addView(editTextInput);
+
+                                        cvalert.setView(wraplayout);
                                         cvalert.setPositiveButton("확인", new DialogInterface.OnClickListener() {
                                             public void onClick(DialogInterface dialog, int whichButton) {
+                                                // 아무것도 입력하지 않았을 때, 오류 방지
+                                                if (editTextInput.getText().toString().equals(""))
+                                                    return;
+
                                                 int editvalue = Integer.parseInt(editTextInput.getText().toString());
                                                 Log.d("editvalue", "" + editvalue);
                                                 int finalvalue = fvalue + editvalue;

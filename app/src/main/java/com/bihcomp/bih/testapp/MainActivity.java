@@ -3,7 +3,10 @@ package com.bihcomp.bih.testapp;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
@@ -421,6 +424,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             mViewPager.setCurrentItem(0);
                         }
                     });
+                    alert.setNeutralButton("연락처 선택", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int whichButton) {
+                            Intent mIntent = new Intent(Intent.ACTION_PICK);
+                            mIntent.setData(ContactsContract.CommonDataKinds.Phone.CONTENT_URI);
+                            startActivityForResult(mIntent, 0);
+
+                        }
+                    });
 
                     alert.show();
 
@@ -458,6 +469,39 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
         }
     }
+
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(resultCode == RESULT_OK)
+        {
+            Cursor cursor = getContentResolver().query(data.getData(),
+                    new String[]{ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME,
+                            ContactsContract.CommonDataKinds.Phone.NUMBER}, null, null, null);
+            cursor.moveToFirst();
+            String sName   = cursor.getString(0);
+            String sNumber = cursor.getString(1);
+            cursor.close();
+
+            String tempstr = readFromContactFile();
+            tempstr = tempstr.replace("]","");
+            String addstr =  ",{'name':'" + sName + "','phonenumber':'" + sNumber + "','photo':'man1','value':0}]";
+            tempstr = tempstr + addstr;
+            writeToContactFile(tempstr);
+            //Toast.makeText(getParent(), addstr, Toast.LENGTH_SHORT).show();
+            Log.d("addstr", addstr);
+
+            Snackbar.make(this.mViewPager, sName + " 님의 연락처가 추가되었습니다.", Snackbar.LENGTH_LONG)
+                    .setAction("Action", null).show();
+
+
+
+        }
+        mViewPager.setCurrentItem(0);
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
 
 
 
