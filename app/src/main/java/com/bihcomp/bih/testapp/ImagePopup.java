@@ -16,6 +16,7 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.Toolbar;
 
 import com.bihcomp.bih.testapp.Fragment2;
 import com.bihcomp.bih.testapp.R;

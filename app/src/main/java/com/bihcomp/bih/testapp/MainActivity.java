@@ -481,6 +481,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     mViewPager.refreshDrawableState();
                     mViewPager.setCurrentItem(2);
                 } else if (mViewPager.getCurrentItem() == 1) {
+                    startActivity(new Intent(MainActivity.this, GalleryLibrary.class));
+
 
                 } else if (mViewPager.getCurrentItem() == 2) {
                     mViewPager.setCurrentItem(0);
