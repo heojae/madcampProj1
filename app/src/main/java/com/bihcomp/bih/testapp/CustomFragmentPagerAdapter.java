@@ -7,7 +7,7 @@ import android.support.v4.app.FragmentPagerAdapter;
 import java.util.ArrayList;
 
 public class CustomFragmentPagerAdapter extends FragmentPagerAdapter {
-    private String[] VIEW_MAPNTOP_TITLES = {"연락처","갤러리","회계장부"};
+    private String[] VIEW_MAPNTOP_TITLES = {"빚쟁이들","증거","빚"};
     private ArrayList<Fragment> fList;
 
     // 아답터 생성자

@@ -126,15 +126,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         // 액션바 속성 정의
         bar.setDisplayShowTitleEnabled(true);   // 액션바 노출 유무
-        bar.setTitle("자산관리 어플리케이션");   // 액션바 타이틀 라벨
+        bar.setTitle("  빚쟁이");   // 액션바 타이틀 라벨
 
         // 액션바에 모드 설정 = ActionBar.NAVIGATION_MODE_TABS 로 TAB 모드로 설정
         bar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
         // 액션바에 추가될 탭 생성
-        ActionBar.Tab tab1 = bar.newTab().setText("연락처").setTabListener(tabListener);
-        ActionBar.Tab tab2 = bar.newTab().setText("갤러리").setTabListener(tabListener);
-        ActionBar.Tab tab3 = bar.newTab().setText("회계장부").setTabListener(tabListener);
+        ActionBar.Tab tab1 = bar.newTab().setText("빚쟁이들").setTabListener(tabListener);
+        ActionBar.Tab tab2 = bar.newTab().setText("증거").setTabListener(tabListener);
+        ActionBar.Tab tab3 = bar.newTab().setText("빚").setTabListener(tabListener);
 
         // 액션바에 탭 추가
         bar.addTab(tab1);

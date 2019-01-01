@@ -7,6 +7,10 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Matrix;
+import android.graphics.Paint;
+import android.graphics.Rect;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
@@ -37,6 +41,9 @@ public class GalleryLibrary extends AppCompatActivity {
     private Context mContext;
 
     public GridView selectedGridView;
+    public GridView allGridView;
+
+    public final int[] Scrollposition = new int[2];
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -45,17 +52,22 @@ public class GalleryLibrary extends AppCompatActivity {
         mContext = this;
 
 
+
         getSupportActionBar().setTitle("이미지 선택");
 
         // 하단 갤러리뷰
         GridView gv = (GridView)findViewById(R.id.gallery_view);
-        final GridViewAdapter ga = new GridViewAdapter(this);
-        gv.setAdapter(ga);
+        final GridViewAdapter ga[] = new GridViewAdapter[1];
+        GridViewAdapter gacontext = new GridViewAdapter(this);
+        ga[0] = gacontext;
+        gv.setAdapter(ga[0]);
 
         // 상단 갤러리뷰
         GridView gvsel = (GridView)findViewById(R.id.gallery_view_selected);
-        final SelectedGridViewAdapter gasel = new SelectedGridViewAdapter(this);
-        gvsel.setAdapter(gasel);
+        final SelectedGridViewAdapter gasel[] = new SelectedGridViewAdapter[1];
+        SelectedGridViewAdapter gaselcontext = new SelectedGridViewAdapter(this);
+        gasel[0] = gaselcontext;
+        gvsel.setAdapter(gasel[0]);
 
         gv.setOnItemClickListener(new AdapterView.OnItemClickListener(){
             public void onItemClick(AdapterView parent, View v, int position, long id){
@@ -63,17 +75,29 @@ public class GalleryLibrary extends AppCompatActivity {
                 // 이미지 선택 시 리스트 추가
                 String beforestring = readFromSettingFile("GALLERY_SELECTED_IMAGE_LIST");
                 String afterstring = "";
-                if (beforestring.equals(""))
-                    afterstring = ga.getImgPath(position);
-                else
-                    afterstring = beforestring + "///SPLIT///" + ga.getImgPath(position);
+                if (beforestring.equals("") && !beforestring.contains(ga[0].getImgPath(position)))
+                {
+                    afterstring = ga[0].getImgPath(position);
+                    writeToSettingFile("GALLERY_SELECTED_IMAGE_LIST", afterstring);
+                }
+                else if (!beforestring.contains(ga[0].getImgPath(position)))
+                {
+                    afterstring = beforestring + "///SPLIT///" + ga[0].getImgPath(position);
+                    writeToSettingFile("GALLERY_SELECTED_IMAGE_LIST", afterstring);
+                }
 
-                writeToSettingFile("GALLERY_SELECTED_IMAGE_LIST", afterstring);
+                int index = allGridView.getFirstVisiblePosition() * 120;
 
                 SelectedGridViewAdapter tgasel = new SelectedGridViewAdapter(GalleryLibrary.this);
+                GridViewAdapter tga = new GridViewAdapter(GalleryLibrary.this);
+                gasel[0] = tgasel;
+                ga[0] = tga;
                 selectedGridView.setAdapter(tgasel);
+                allGridView.setAdapter(tga);
                 tgasel.notifyDataSetInvalidated();
+                tga.notifyDataSetInvalidated();
                 gridViewSetting();
+
             }
         });
 
@@ -87,8 +111,8 @@ public class GalleryLibrary extends AppCompatActivity {
                 Toast.makeText(GalleryLibrary.this,beforestring,Toast.LENGTH_LONG);
                 Log.d("removetext:beforestring", beforestring);
 
-                Log.d("removetext:removestring", gasel.getImgPath(position));
-                removestring = beforestring.replace(gasel.getImgPath(position), "");
+                Log.d("removetext:removestring", gasel[0].getImgPath(position));
+                removestring = beforestring.replace(gasel[0].getImgPath(position), "");
                 removestring = removestring.replace("///SPLIT//////SPLIT///", "///SPLIT///");
                 if (removestring.indexOf("///SPLIT///") == 0)
                     removestring = removestring.replaceFirst("///SPLIT///", "");
@@ -98,16 +122,25 @@ public class GalleryLibrary extends AppCompatActivity {
 
                 writeToSettingFile("GALLERY_SELECTED_IMAGE_LIST", removestring);
 
-                gasel.removeItem(position);
-                gasel.notifyDataSetInvalidated();
+                gasel[0].removeItem(position);
+                gasel[0].notifyDataSetInvalidated();
                 gridViewSetting();
+
+                GridViewAdapter tga = new GridViewAdapter(GalleryLibrary.this);
+                ga[0] = tga;
+                allGridView.setAdapter(tga);
+                tga.notifyDataSetInvalidated();
+
             }
         });
 
 
 
         selectedGridView = (GridView)findViewById(R.id.gallery_view_selected);
+        allGridView = (GridView)findViewById(R.id.gallery_view);
 
+        Scrollposition[0] = allGridView.getScrollX();
+        Scrollposition[1] = allGridView.getScrollY();
 
         gridViewSetting();
 
@@ -124,11 +157,13 @@ public class GalleryLibrary extends AppCompatActivity {
         private String geoData;
         private ArrayList<String> thumbsDataList;
         private ArrayList<String> thumbsIDList;
+        private ArrayList<String> thumbsStateList;
 
         public GridViewAdapter(Context c){
             mContext = c;
             thumbsDataList = new ArrayList<String>();
             thumbsIDList = new ArrayList<String>();
+            thumbsStateList = new ArrayList<String>();
             getThumbInfo(thumbsIDList, thumbsDataList);
         }
 
@@ -156,6 +191,11 @@ public class GalleryLibrary extends AppCompatActivity {
         }
 
         public View getView(int position, View convertView, ViewGroup parent) {
+
+
+
+
+
             ImageView imageView;
             if (convertView == null){
                 imageView = new ImageView(mContext);
@@ -170,7 +210,33 @@ public class GalleryLibrary extends AppCompatActivity {
             bo.inSampleSize = 8;
             Bitmap bmp = BitmapFactory.decodeFile(thumbsDataList.get(position), bo);
             Bitmap resized = Bitmap.createScaledBitmap(bmp, 200, 200, true);
-            imageView.setImageBitmap(resized);
+
+
+            if (thumbsStateList.get(position).equals("yes")){
+                // 최종 Bitmap
+                Bitmap resultimage = Bitmap.createBitmap(200, 200, Bitmap.Config.ARGB_8888);
+
+                // 단색 Bitmap
+                Bitmap image = Bitmap.createBitmap(200, 200, Bitmap.Config.ARGB_8888);
+                image.eraseColor(android.graphics.Color.rgb(52, 73, 94));
+
+                Paint paint = new Paint();
+                paint.setAlpha(100);
+
+                Canvas canvas = new Canvas(resultimage);
+                canvas.drawBitmap(resized, new Matrix(), null);
+                canvas.drawBitmap(image, new Matrix(), paint);
+
+                Bitmap crop = Bitmap.createBitmap(resultimage, 6, 49, 188, 102);
+                //crop = Bitmap.createScaledBitmap(crop, 200, 200, true);
+
+                Canvas canvas2 = new Canvas(resultimage);
+                canvas2.drawColor(android.graphics.Color.rgb(52, 73, 94));
+                canvas2.drawBitmap(crop, 6,49, null);
+                imageView.setImageBitmap(resultimage);
+            } else{
+                imageView.setImageBitmap(resized);
+            }
 
             return imageView;
         }
@@ -197,13 +263,34 @@ public class GalleryLibrary extends AppCompatActivity {
                 int thumbsImageIDCol = imageCursor.getColumnIndex(MediaStore.Images.Media.DISPLAY_NAME);
                 int thumbsSizeCol = imageCursor.getColumnIndex(MediaStore.Images.Media.SIZE);
                 int num = 0;
+
+                // 문자열 파싱
+                String pathname = readFromSettingFile("GALLERY_SELECTED_IMAGE_LIST");
+                String[] pathnames = pathname.split("///SPLIT///");
+
+
                 do {
+
+                    // 문자열 내에 단어가 포함될 경우에만 추가
+                    int imgData = imageCursor.getColumnIndex(MediaStore.Images.Media.DATA);
+                    String imageDataPath = imageCursor.getString(imgData);
+
                     thumbsID = imageCursor.getString(thumbsIDCol);
                     thumbsData = imageCursor.getString(thumbsDataCol);
                     thumbsImageID = imageCursor.getString(thumbsImageIDCol);
                     imgSize = imageCursor.getString(thumbsSizeCol);
                     num++;
                     if (thumbsImageID != null){
+                        boolean isItSelected = false;
+                        for (String str:pathnames)
+                        {
+                            if (str.equals(imageDataPath))
+                            {
+                                isItSelected = true;
+                                break;
+                            }
+                        }
+                        thumbsStateList.add(isItSelected?"yes":"no");
                         thumbsIDs.add(thumbsID);
                         thumbsDatas.add(thumbsData);
                     }
@@ -235,6 +322,13 @@ public class GalleryLibrary extends AppCompatActivity {
         public String getImgPath(int selectedIndex){
             String imgPath = getImageInfo(imgData, geoData, thumbsIDList.get(selectedIndex));
             return imgPath;
+        }
+
+        public void removeItem(int position) {
+
+            thumbsDataList.remove(position);
+            thumbsIDList.remove(position);
+            notifyDataSetChanged();
         }
     }
 
