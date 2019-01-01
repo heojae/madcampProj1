@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +19,12 @@ import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 
 public class Fragment2 extends Fragment {
@@ -37,7 +44,7 @@ public class Fragment2 extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         //return super.onCreateView(inflater, container, savedInstanceState);
-        View view = inflater.inflate(R.layout.grid_layout,container,false);
+        View view = inflater.inflate(R.layout.fragment_fragment2,container,false);
         GridView gridView = view.findViewById(R.id.grid_view);
         final GridViewAdapter ga = new GridViewAdapter(getActivity());
         gridView.setAdapter(ga);
@@ -47,6 +54,13 @@ public class Fragment2 extends Fragment {
                 ga.callImageViewer(position);
             }
         });
+
+
+        // 회계기록 없을 때 처리
+        if (gridView.getAdapter().getCount() != 0)
+            view.findViewById(R.id.LayoutGalleryNotFound).setVisibility(View.GONE);
+        else
+            view.findViewById(R.id.LayoutGalleryNotFound).setVisibility(View.VISIBLE);
 
         return view;
     }
@@ -123,7 +137,7 @@ public class Fragment2 extends Fragment {
             BitmapFactory.Options bo = new BitmapFactory.Options();
             bo.inSampleSize = 8;
             Bitmap bmp = BitmapFactory.decodeFile(thumbsDataList.get(position), bo);
-            Bitmap resized = Bitmap.createScaledBitmap(bmp, 95, 95, true);
+            Bitmap resized = Bitmap.createScaledBitmap(bmp, 200, 200, true);
             imageView.setImageBitmap(resized);
 
             return imageView;
@@ -151,6 +165,11 @@ public class Fragment2 extends Fragment {
                 int thumbsImageIDCol = imageCursor.getColumnIndex(MediaStore.Images.Media.DISPLAY_NAME);
                 int thumbsSizeCol = imageCursor.getColumnIndex(MediaStore.Images.Media.SIZE);
                 int num = 0;
+                // 문자열 파싱
+                String pathname = readFromSettingFile("GALLERY_SELECTED_IMAGE_LIST");
+                String[] pathnames = pathname.split("///SPLIT///");
+
+
                 do {
                     thumbsID = imageCursor.getString(thumbsIDCol);
                     thumbsData = imageCursor.getString(thumbsDataCol);
@@ -158,8 +177,19 @@ public class Fragment2 extends Fragment {
                     imgSize = imageCursor.getString(thumbsSizeCol);
                     num++;
                     if (thumbsImageID != null){
-                        thumbsIDs.add(thumbsID);
-                        thumbsDatas.add(thumbsData);
+
+                        // 문자열 내에 단어가 포함될 경우에만 추가
+                        int imgData = imageCursor.getColumnIndex(MediaStore.Images.Media.DATA);
+                        String imageDataPath = imageCursor.getString(imgData);
+
+                        for (String str:pathnames)
+                        {
+                            if (str.equals(imageDataPath))
+                            {
+                                thumbsIDs.add(thumbsID);
+                                thumbsDatas.add(thumbsData);
+                            }
+                        }
                     }
                 }while (imageCursor.moveToNext());
             }
@@ -185,6 +215,41 @@ public class Fragment2 extends Fragment {
             imageCursor.close();
             return imageDataPath;
         }
+    }
+
+    private void writeToSettingFile(String title, String data) {
+        try {
+            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(getContext().openFileOutput(title + ".cfg", Context.MODE_PRIVATE));
+            outputStreamWriter.write(data);
+            outputStreamWriter.close();
+        }
+        catch (IOException e) {
+            Log.e("WriteFile", "Exception: File write failed (" + title + ")");
+        }
+    }
+
+    private String readFromSettingFile(String title) {
+        String ret = "";
+        try {
+            InputStream inputStream = getContext().openFileInput(title + ".cfg");
+            if ( inputStream != null ) {
+                InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+                String receiveString = "";
+                StringBuilder stringBuilder = new StringBuilder();
+                while ( (receiveString = bufferedReader.readLine()) != null ) {
+                    stringBuilder.append(receiveString);
+                }
+                inputStream.close();
+                ret = stringBuilder.toString();
+            }
+        }
+        catch (FileNotFoundException e) {
+            Log.e("ReadFile", "Exception: File not found (" + title + ")");
+        } catch (IOException e) {
+            Log.e("ReadFile", "Exception: Can not read file (" + title + ")");
+        }
+        return ret;
     }
 
 }

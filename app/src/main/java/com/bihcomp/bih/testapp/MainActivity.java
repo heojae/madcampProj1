@@ -507,6 +507,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         imm.showSoftInput(editTextCt, 0);
                     }
                 } else if (mViewPager.getCurrentItem() == 1) {
+                    mViewPager.getAdapter().notifyDataSetChanged();
 
                 } else if (mViewPager.getCurrentItem() == 2) {
                     Snackbar.make(this.mViewPager, "b^.^b", Snackbar.LENGTH_LONG)

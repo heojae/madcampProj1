@@ -83,10 +83,10 @@ public class Fragment3 extends Fragment {
         recyclerView.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                Toast.makeText(getContext(),"RecyclerView",Toast.LENGTH_SHORT).show();
+                //Toast.makeText(getContext(),"RecyclerView",Toast.LENGTH_SHORT).show();
                 //int itemPosition = recyclerView.getChildLayoutPosition(v);
                 long contentslist = recyclerView.getChildItemId(v);
-                Toast.makeText(getContext(),"contentslist : " + contentslist,Toast.LENGTH_SHORT).show();
+                //Toast.makeText(getContext(),"contentslist : " + contentslist,Toast.LENGTH_SHORT).show();
 
 
 

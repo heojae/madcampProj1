@@ -24,6 +24,11 @@ public class CustomFragmentPagerAdapter extends FragmentPagerAdapter {
 
     }
 
+    @Override
+    public int getItemPosition(Object object) {
+        return POSITION_NONE;
+    }
+
     // 해당 프라그먼트 호출 함수.
     @Override
     public Fragment getItem(int position) {
