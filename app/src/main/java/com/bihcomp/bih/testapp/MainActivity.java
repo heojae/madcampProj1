@@ -54,6 +54,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private static final int MY_PERMISSIONS_REQUEST_CALL_PHONE = 2;
     private static final int MY_PERMISSIONS_REQUEST_READ_CONTACTS = 3;
 
+    private static final int GET_CONTACT_DATA_REQUEST = 0;
+    private static final int GET_GALLERY_DATA_REQUEST = 1;
 
 
     private ViewPager mViewPager;
@@ -361,22 +363,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 builder.show();
                             }
 
-                            mViewPager.setCurrentItem(0);
+                            mViewPager.getAdapter().notifyDataSetChanged();
+                            //mViewPager.setCurrentItem(0);
                         }
                     });
 
                     alert.setNegativeButton("취소",new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int whichButton) {
-                            mViewPager.setCurrentItem(0);
+                            mViewPager.getAdapter().notifyDataSetChanged();
+                            //mViewPager.setCurrentItem(0);
                         }
                     });
 
                     alert.show();
 
                     mViewPager.refreshDrawableState();
-                    mViewPager.setCurrentItem(2);
+                    //mViewPager.setCurrentItem(2);
                 } else if (mViewPager.getCurrentItem() == 1) {
-
+                    startActivityForResult(new Intent(MainActivity.this, GalleryLibrary.class), GET_GALLERY_DATA_REQUEST);
                 } else if (mViewPager.getCurrentItem() == 2) {
                     mViewPager.setCurrentItem(0);
                     Snackbar.make(this.mViewPager, "값을 제거할 연락처를 선택하세요.", Snackbar.LENGTH_LONG)
@@ -440,7 +444,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                             }
                                         });
                                 builder.show();
-                                mViewPager.setCurrentItem(0);
+                                mViewPager.getAdapter().notifyDataSetChanged();
+                                //mViewPager.setCurrentItem(0);
                             } else {
                                 String tempstr = readFromContactFile();
 
@@ -456,7 +461,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                     Log.d("addstr", addstr);
                                 }
                                 writeToContactFile(tempstr);
-                                mViewPager.setCurrentItem(0);
+                                mViewPager.getAdapter().notifyDataSetChanged();
+                                //mViewPager.setCurrentItem(0);
                             }
 
                         }
@@ -464,14 +470,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                     alert.setNegativeButton("취소",new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int whichButton) {
-                            mViewPager.setCurrentItem(0);
+                            mViewPager.getAdapter().notifyDataSetChanged();
+                            //mViewPager.setCurrentItem(0);
                         }
                     });
                     alert.setNeutralButton("연락처 선택", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int whichButton) {
                             Intent mIntent = new Intent(Intent.ACTION_PICK);
                             mIntent.setData(ContactsContract.CommonDataKinds.Phone.CONTENT_URI);
-                            startActivityForResult(mIntent, 0);
+                            startActivityForResult(mIntent, GET_CONTACT_DATA_REQUEST);
 
                         }
                     });
@@ -479,11 +486,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     alert.show();
 
                     mViewPager.refreshDrawableState();
-                    mViewPager.setCurrentItem(2);
+                    //mViewPager.setCurrentItem(2);
                 } else if (mViewPager.getCurrentItem() == 1) {
-                    startActivity(new Intent(MainActivity.this, GalleryLibrary.class));
-
-
+                    startActivityForResult(new Intent(MainActivity.this, GalleryLibrary.class), GET_GALLERY_DATA_REQUEST);
                 } else if (mViewPager.getCurrentItem() == 2) {
                     mViewPager.setCurrentItem(0);
                     Snackbar.make(this.mViewPager, "값을 추가할 연락처를 선택하세요.", Snackbar.LENGTH_LONG)
@@ -508,9 +513,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     }
                 } else if (mViewPager.getCurrentItem() == 1) {
                     mViewPager.getAdapter().notifyDataSetChanged();
-
+                    Snackbar.make(this.mViewPager, "갤러리를 새로고칩니다.", Snackbar.LENGTH_LONG)
+                            .setAction("Action", null).show();
                 } else if (mViewPager.getCurrentItem() == 2) {
-                    Snackbar.make(this.mViewPager, "b^.^b", Snackbar.LENGTH_LONG)
+                    Snackbar.make(this.mViewPager, "회계장부를 새로고칩니다.", Snackbar.LENGTH_LONG)
                             .setAction("Action", null).show();
                 }
                 break;
@@ -521,36 +527,45 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if(resultCode == RESULT_OK)
+        if(requestCode == GET_CONTACT_DATA_REQUEST)
         {
-            Cursor cursor = getContentResolver().query(data.getData(),
-                    new String[]{ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME,
-                            ContactsContract.CommonDataKinds.Phone.NUMBER}, null, null, null);
-            cursor.moveToFirst();
-            String sName   = cursor.getString(0);
-            String sNumber = cursor.getString(1);
-            cursor.close();
-
-            String tempstr = readFromContactFile();
-
-            if (tempstr.equals(""))
+            if(resultCode == RESULT_OK)
             {
-                tempstr = "[{'name':'" + sName + "','phonenumber':'" + sNumber + "','photo':'man1','value':0}]";
-            }
-            else
-            {
-                tempstr = tempstr.replace("]","");
-                String addstr =  ",{'name':'" + sName + "','phonenumber':'" + sNumber + "','photo':'man1','value':0}]";
-                tempstr = tempstr + addstr;
-                Log.d("addstr", addstr);
-            }
-            writeToContactFile(tempstr);
+                Cursor cursor = getContentResolver().query(data.getData(),
+                        new String[]{ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME,
+                                ContactsContract.CommonDataKinds.Phone.NUMBER}, null, null, null);
+                cursor.moveToFirst();
+                String sName   = cursor.getString(0);
+                String sNumber = cursor.getString(1);
+                cursor.close();
 
-            Snackbar.make(this.mViewPager, sName + " 님의 연락처가 추가되었습니다.", Snackbar.LENGTH_LONG)
-                    .setAction("Action", null).show();
+                String tempstr = readFromContactFile();
 
-            mViewPager.setCurrentItem(0);
+                if (tempstr.equals(""))
+                {
+                    tempstr = "[{'name':'" + sName + "','phonenumber':'" + sNumber + "','photo':'man1','value':0}]";
+                }
+                else
+                {
+                    tempstr = tempstr.replace("]","");
+                    String addstr =  ",{'name':'" + sName + "','phonenumber':'" + sNumber + "','photo':'man1','value':0}]";
+                    tempstr = tempstr + addstr;
+                    Log.d("addstr", addstr);
+                }
+                writeToContactFile(tempstr);
+
+                Snackbar.make(this.mViewPager, sName + " 님의 연락처가 추가되었습니다.", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
+
+                mViewPager.getAdapter().notifyDataSetChanged();
+                //mViewPager.setCurrentItem(0);
+            }
+        } else if(requestCode == GET_GALLERY_DATA_REQUEST)
+        {
+            mViewPager.getAdapter().notifyDataSetChanged();
+
         }
+
 
         super.onActivityResult(requestCode, resultCode, data);
     }
@@ -788,12 +803,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         }
     }
-
-
-
-
-
-
 
 
 

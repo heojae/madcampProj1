@@ -79,7 +79,28 @@ public class GalleryLibrary extends AppCompatActivity {
 
         gvsel.setOnItemClickListener(new AdapterView.OnItemClickListener(){
             public void onItemClick(AdapterView parent, View v, int position, long id){
-                gasel.callImageViewer(position);
+
+                // 이미지 선택 시 리스트 제거
+                String beforestring = readFromSettingFile("GALLERY_SELECTED_IMAGE_LIST");
+                String removestring = "";
+
+                Toast.makeText(GalleryLibrary.this,beforestring,Toast.LENGTH_LONG);
+                Log.d("removetext:beforestring", beforestring);
+
+                Log.d("removetext:removestring", gasel.getImgPath(position));
+                removestring = beforestring.replace(gasel.getImgPath(position), "");
+                removestring = removestring.replace("///SPLIT//////SPLIT///", "///SPLIT///");
+                if (removestring.indexOf("///SPLIT///") == 0)
+                    removestring = removestring.replaceFirst("///SPLIT///", "");
+
+                Toast.makeText(GalleryLibrary.this,removestring,Toast.LENGTH_LONG);
+                Log.d("removetext:removestring", removestring);
+
+                writeToSettingFile("GALLERY_SELECTED_IMAGE_LIST", removestring);
+
+                gasel.removeItem(position);
+                gasel.notifyDataSetInvalidated();
+                gridViewSetting();
             }
         });
 
@@ -148,7 +169,7 @@ public class GalleryLibrary extends AppCompatActivity {
             BitmapFactory.Options bo = new BitmapFactory.Options();
             bo.inSampleSize = 8;
             Bitmap bmp = BitmapFactory.decodeFile(thumbsDataList.get(position), bo);
-            Bitmap resized = Bitmap.createScaledBitmap(bmp, 95, 95, true);
+            Bitmap resized = Bitmap.createScaledBitmap(bmp, 200, 200, true);
             imageView.setImageBitmap(resized);
 
             return imageView;
@@ -327,6 +348,7 @@ public class GalleryLibrary extends AppCompatActivity {
                             {
                                 thumbsIDs.add(thumbsID);
                                 thumbsDatas.add(thumbsData);
+                                break;
                             }
                         }
                     }
@@ -358,6 +380,13 @@ public class GalleryLibrary extends AppCompatActivity {
         public String getImgPath(int selectedIndex){
             String imgPath = getImageInfo(imgData, geoData, thumbsIDList.get(selectedIndex));
             return imgPath;
+        }
+
+        public void removeItem(int position) {
+
+            thumbsDataList.remove(position);
+            thumbsIDList.remove(position);
+            notifyDataSetChanged();
         }
     }
 

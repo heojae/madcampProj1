@@ -188,6 +188,7 @@ public class Fragment2 extends Fragment {
                             {
                                 thumbsIDs.add(thumbsID);
                                 thumbsDatas.add(thumbsData);
+                                break;
                             }
                         }
                     }
